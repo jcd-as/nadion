@@ -18,11 +18,11 @@ __NOTE__: Please do not use the artwork or music in an actual product. They do n
 What does Nadion Get Me?
 -------------------------
 
-Primarily Nadion is a framework for creating game levels in the [Tiled](http://www.mapeditor.org) map editor. To this end, Nadion provides Trigger, Area, Alarm and Emitter entities which can be added and tweaked in Tiled, setting up game logic without needing to write code to do it. (Adding some of these to the sample is planned).
+Primarily Nadion is a framework for creating game levels in the [Tiled](http://www.mapeditor.org) map editor. To this end, Nadion provides Trigger, Area, Alarm and Emitter entities which can be added and tweaked in Tiled, setting up game logic without needing to write code to do it. (Adding some of these to the sample is planned). It supports multiple layers, which can scroll at different rates (“parallax” scrolling), as well as Tiled image layers and object layers (which map to Groups in Phaser and which contain all your sprites and objects).
 
-Nadion also provides some simple game objects such as a state machine and on-screen controls for touch-screen devices. It also provides some helper functions that I have found useful; things such as finding a named item in a group or array (see the docs on the Nadion namespace for a complete list).
+Nadion also provides some simple game objects such as a state machine, for handling sprite logic, and on-screen controls for touch-screen devices. It also provides some helper functions that I have found useful; things such as finding a named item in a group or array (see the docs on the Nadion namespace for a complete list).
 
-There are also some development-time helpers. You can use a browser query string ('render=canvas') to force canvas rendering. There is a "developer mode" toggle you can set that will set some hotkeys: 'f' will display the frame-rate, 'd' will show some debug info (currently just sprite bounds), 'p' will toggle on/off Particles and the '1' - '5' keys will toggle on/off the drawing of first five tile layers. The sample also shows how to use a query string to enter "developer mode" and start at a particular level (overriding what's saved in local storage).
+Plus are some development-time helpers. You can use a browser query string ('render=canvas') to force canvas rendering. There is a "developer mode" toggle you can set that will set some hotkeys: 'f' will display the frame-rate, 'd' will show some debug info (currently just sprite bounds), 'p' will toggle on/off Particles and the '1' - '5' keys will toggle on/off the drawing of first five tile layers. The sample also shows how to use a query string to enter "developer mode" and start at a particular level (overriding what's saved in local storage).
 
 
 Getting Started
