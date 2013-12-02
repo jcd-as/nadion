@@ -189,15 +189,15 @@
 
 	MyGame.Player.prototype.spriteCollisionCallback = function( p, s )
 	{
-		// call the sprites collision handler
-		s.collisionHandler( p );
+		// we were hit by an enemy! 
+		if( s instanceof MyGame.Enemy )
+			this.hit();
 	};
 
 	MyGame.Player.prototype.canJump = function()
 	{
 		return this.time.elapsedSince( this.recovery_timer ) > this.recovery_timeout;
 	};
-
 
 	MyGame.Player.prototype.updateObject = function()
 	{
@@ -214,7 +214,7 @@
 		// collide with sprites that are 'solid'
 		for( i = 0; i < game_state.groups.length; i++ )
 		{
-			this.game.physics.collide( this, game_state.groups[i] );
+			this.game.physics.collide( this, game_state.groups[i], this.spriteCollisionCallback, null, this );
 		}
 
 		// handle input
@@ -295,6 +295,9 @@
 
 	MyGame.Player.prototype.hit = function()
 	{
+		// a real game would do something more interesting here, but we'll just
+		// enter the 'stunned' state
+
 		// can't be hit while already stunned
 		if( this.fsm.getState() != 'stunned' )
 		{

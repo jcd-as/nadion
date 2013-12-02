@@ -48,8 +48,7 @@
 	];
 	MyGame.Enemy = function( game, name, x, y, width, height, props )
 	{
-		__super.call( this, game, 'bad-cat', name, x, y, width, height );
-		this.__super = __super;
+		Nadion.BaseSprite.call( this, game, 'bad-cat', name, x, y, width, height, props );
 
 		// fields
 		this.fsm = new Nadion.StateMachine( enemy_states, this );
@@ -61,7 +60,6 @@
 		// sprite fields
 		this.body.bounce.y = 0.0;
 		this.body.collideWorldBounds = true;
-		this.body.width = 32;
 		this.body.gravity.y = 20;
 		this.body.maxVelocity.y = 1000;
 	};
@@ -120,70 +118,6 @@
 			break;
 		}
 	};
-
-//	MyGame.Enemy.prototype.collisionHandler = function( player )
-//	{
-//		player.hit();
-//
-//		// X separation
-//		// no x separation if the player isn't moving horizontally
-//		var _overlap, _velocity1, _velocity2;
-//		var deltaX = player.body.deltaX();
-//		if( deltaX !== 0 )
-//		{
-//			// player is moving left
-//			if( deltaX < 0 )
-//			{
-//				_overlap = this.body.x + this.body.width - player.body.x;
-//				this.body.touching.right = true;
-//				player.body.touching.left = true;
-//			}
-//			// player is moving right
-//			else if( deltaX > 0 )
-//			{
-//				_overlap = this.body.x - player.body.width - player.body.x;
-//				this.body.touching.left = true;
-//				player.body.touching.right = true;
-//			}
-//
-//			if( _overlap !== 0 )
-//			{
-//				//var _velocity1 = this.body.velocity.x;
-//				_velocity1 = 0;	// enemies don't move horizontally
-//				_velocity2 = player.body.velocity.x;
-//
-//				// separate player from this sprite
-//				player.body.x += _overlap;
-//				player.body.velocity.x = -_velocity2;
-//			}
-//		}
-//		// no horizontal movement, use player's facing instead
-//		else
-//		{
-//			// half extents along x-axis:
-//			var a_extent = player.body.width / 2;
-//			var b_extent = this.body.width / 2;
-//
-//			// calc overlap on x-axis:
-//			var nx = player.body.x - this.body.x;
-//			_overlap = a_extent + b_extent - Math.abs( nx );
-//			if( player.facing == Nadion.RIGHT )
-//			{
-//				player.body.x -= _overlap;
-//				player.body.velocity.x = -player.walk_velocity;
-//			}
-//			else
-//			{
-//				player.body.x += _overlap;
-//				player.body.velocity.x = player.walk_velocity;
-//			}
-//		}
-//
-//		// don't do any Y separation
-//
-//		player.body.updateHulls();
-//		this.body.updateHulls();
-//	};
 
 })();
 

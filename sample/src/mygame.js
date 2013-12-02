@@ -36,8 +36,7 @@ var MyGame = (function()
 		save_file : 'MyGameSaveFile',
 
 		// keyboard controls
-		KEY_JUMP : Phaser.Keyboard.X,
-		KEY_ACTION : Phaser.Keyboard.Z,
+		KEY_JUMP : Phaser.Keyboard.SPACEBAR,
 		KEY_L : Phaser.Keyboard.LEFT,
 		KEY_R : Phaser.Keyboard.RIGHT
 	};

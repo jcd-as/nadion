@@ -47,6 +47,12 @@
 				url: 'assets/img/chick.png',
 				width: 16,
 				height:18 
+			},
+			{
+				name: 'bad-cat',
+				url: 'assets/img/baddie_cat_1.png',
+				width: 16,
+				height:16 
 			}
 		];
 		// images
