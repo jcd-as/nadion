@@ -1,0 +1,35 @@
+{
+  "name": "Nadion",
+  "version": "0.1.0",
+  "description": "An add-on to Phaser (http://phaser.io). Provides creation of entire game worlds in the Tiled editor (https://www.mapeditor.org) with very little code. Multiple scrolling layers, image layers, Sprites, Triggers, Emitters, Areas and Alarms can all be defined directly in Tiled.",
+  "author": "Josh Shepard",
+  "logo": "https://raw.github.com/jcd-as/nadion/master/nadion.png",
+  "homepage": "http://jcd-as.github.io/nadion",
+  "bugs": "https://github.com/jcd-as/nadion/issues",
+  "license": "MIT",
+  "licenseUrl": "http://www.opensource.org/licenses/mit-license.php",
+  "repository": {
+    "type": "git",
+    "url": "https://jcd-as@github.com/jcd-as/nadion.git"
+  },
+  "keywords": [
+	"Phaser",
+    "HTML5",
+    "game",
+    "canvas",
+    "2d",
+    "WebGL",
+    "web audio",
+    "physics",
+    "tweens",
+    "javascript"
+  ],
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-connect": "~0.5.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-uglify": "~0.2.4"
+  }
+}

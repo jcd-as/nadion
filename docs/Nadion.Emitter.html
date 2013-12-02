@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: Emitter</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Class: Emitter</h1>
+    
+    
+
+
+
+<section>
+    
+<header>
+    <h2>
+        <span class="ancestors"><a href="Nadion.html">Nadion</a>.</span>
+    
+    Emitter
+    </h2>
+    
+        <div class="class-description">Extension of Phaser Emitter for creation from Tiled files.
+
+<p>Tiled properties:</p>
+<ul>
+<li>period: Number of milliseconds that each particle lives, once emitted.  (Inifinite if === 0)</li>
+<li>delay: How often in milliseconds a particle is emitted</li>
+<li>image: The key for the image to be used for the particles</li>
+<li>frames: A string representing the array of frames to use for the particles (e.g. '[0, 1, 2]')</li>
+<li>minParticleSpeedX: see Phaser docs</li>
+<li>minParticleSpeedY: see Phaser docs</li>
+<li>maxParticleSpeedX: see Phaser docs</li>
+<li>maxParticleSpeedY: see Phaser docs</li>
+<li>minRotation: see Phaser docs</li>
+<li>maxRotation: see Phaser docs</li>
+<li>gravity: see Phaser docs</li>
+<li>autostart: boolean. Should the emitter start immediately?</li>
+<li>constrained: boolean. If true the area that the emitter covers is constrained to the overlap between it and the visible portion of the map. Useful for improving performance - keeps the emitter from generating particles off-screen.</li>
+</ul></div>
+    
+</header>  
+
+<article>
+    <div class="container-overview">
+    
+    
+    
+        
+<dt>
+    <h4 class="name" id="Emitter"><span class="type-signature"></span>new Emitter<span class="signature">(game, key, name, x, y, width, height, props)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>game</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Phaser.Game</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Key for Phaser cache storage</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Name for Nadion creation</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>x</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">X position</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Y position</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>width</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Width in pixels</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>height</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Height in pixels</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>props</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Properties collection from Tiled</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="entities.js.html">entities.js</a>, <a href="entities.js.html#line627">line 627</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+    
+    </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</article>
+
+</section>  
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Nadion.Alarm.html">Alarm</a></li><li><a href="Nadion.Area.html">Area</a></li><li><a href="Nadion.BaseSprite.html">BaseSprite</a></li><li><a href="Nadion.Controls.html">Controls</a></li><li><a href="Nadion.Emitter.html">Emitter</a></li><li><a href="Nadion.Level.html">Level</a></li><li><a href="Nadion.NextLevelTrigger.html">NextLevelTrigger</a></li><li><a href="Nadion.ResetLevelTrigger.html">ResetLevelTrigger</a></li><li><a href="Nadion.SetTileTrigger.html">SetTileTrigger</a></li><li><a href="Nadion.StateMachine.html">StateMachine</a></li><li><a href="Nadion.TeleportTrigger.html">TeleportTrigger</a></li><li><a href="Nadion.Trigger.html">Trigger</a></li></ul><h3>Namespaces</h3><ul><li><a href="Nadion.html">Nadion</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha2</a> on Mon Dec 02 2013 12:22:29 GMT-0800 (PST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
