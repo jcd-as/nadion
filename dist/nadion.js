@@ -76,8 +76,8 @@ var Nadion = Nadion ||
 	 */
 	go : function( initial_state )
 	{
-		// force Canvas (default) or auto (WebGL)?
-		var mode = Phaser.CANVAS;
+		// force Canvas or auto (default)?
+		var mode = Phaser.AUTO;
 		var r;
 		var key_vals = location.search.substring( 1 ).split( '&' );
 
@@ -94,8 +94,8 @@ var Nadion = Nadion ||
 
 		if( typeof( r ) == 'string' )
 		{
-			if( r === 'auto' )
-				mode = Phaser.AUTO;
+			if( r === 'canvas' )
+				mode = Phaser.CANVAS;
 		}
 
 		// let the games begin!
@@ -601,7 +601,6 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 		}
 
 		// set-up paused sprite
-//		this.game.paused_image = new Phaser.Sprite( this.game, 0, 0, 'paused' );
 		if( this.paused_image_key )
 		{
 			this.game.paused_image = new Phaser.Sprite( this.game, 0, 0, this.paused_image_key );
@@ -904,8 +903,6 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 			var obj = og.objects[i];
 			// try to use the best possible namespace/module to look-up the
 			// function in...
-//			var module = this.game_namespace || Nadion || window;
-//			var f = module[obj.type];
 			var f;
 			if( this.game_namespace )
 				f= this.game_namespace[obj.type];
@@ -917,8 +914,6 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 				throw new Error( "Unable to create Object: '" + obj.type + "'" );
 			var o = new f( this.game, obj.name, obj.x, obj.y, obj.width, obj.height, obj.properties );
 
-//			if( o instanceof Nadion.Player )
-//				this.player = o;
 			if( o.is_player_sprite )
 				this.player = o;
 			// TODO: this really ought be be checking against
@@ -991,7 +986,6 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 	 */
 	function callUpdateOn( obj )
 	{
-//		if( !(obj instanceof Nadion.Player) )
 		if( !obj.is_player_sprite )
 			obj.updateObject();
 	}

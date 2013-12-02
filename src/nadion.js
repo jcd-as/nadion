@@ -67,8 +67,8 @@ var Nadion = Nadion ||
 	 */
 	go : function( initial_state )
 	{
-		// force Canvas (default) or auto (WebGL)?
-		var mode = Phaser.CANVAS;
+		// force Canvas or auto (default)?
+		var mode = Phaser.AUTO;
 		var r;
 		var key_vals = location.search.substring( 1 ).split( '&' );
 
@@ -85,8 +85,8 @@ var Nadion = Nadion ||
 
 		if( typeof( r ) == 'string' )
 		{
-			if( r === 'auto' )
-				mode = Phaser.AUTO;
+			if( r === 'canvas' )
+				mode = Phaser.CANVAS;
 		}
 
 		// let the games begin!
