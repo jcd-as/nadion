@@ -1428,7 +1428,8 @@ Nadion.StateMachine.prototype.reset = function()
 	 */
 	Nadion.Trigger.prototype.check = function()
 	{
-		return this.game.physics.overlap( this, this.entity );
+//		return this.game.physics.overlap( this, this.entity );
+		return Phaser.Rectangle.intersects( this.body, this.entity.body );
 	};
 	/** Check to see if the Trigger can be activated, and activate if so
 	 * @function Nadion.Trigger#checkActivate
@@ -2144,7 +2145,8 @@ Nadion.StateMachine.prototype.reset = function()
 		}
 
 		// has the entity entered/left the area?
-		var collide = this.game.physics.overlap( this, this.entity );
+//		var collide = this.game.physics.overlap( this, this.entity );
+		var collide = Phaser.Rectangle.intersects( this.body, this.entity.body );
 
 		// entered
 		if( collide && !this.entity_inside )
