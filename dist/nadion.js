@@ -53,22 +53,9 @@ var Nadion = Nadion ||
 	 * @constant {number} Nadion#VIEW_HEIGHT */
 	VIEW_HEIGHT : 480,
 
-	// game constants, to be left constant
 
-	// directions
-	/** Direction: up
-	 * @constant {number} Nadion#UP */
-//	UP : 0,
-//	/** Direction: right
-//	 * @constant {number} Nadion#RIGHT */
-//	RIGHT : 1,
-//	/** Direction: down
-//	 * @constant {number} Nadion#DOWN */
-//	DOWN: 2, 
-//	/** Direction: left
-//	 * @constant {number} Nadion#LEFT */
-//	LEFT: 3,
-	
+	// methods:
+
 	/**
 	 * main entry point for Nadion-based game
 	 * @function Nadion#go
@@ -1453,6 +1440,8 @@ Nadion.StateMachine.prototype.reset = function()
 	///////////////////////////////////////////////////////////////////
 	// SET TILE TRIGGER
 	///////////////////////////////////////////////////////////////////
+	// TODO: jcs 12/04/13 - shouldn't assume the trigger tile(s) are on the main
+	// layer
 	/** 
 	 * @class Nadion#Nadion.SetTileTrigger
 	 * @classdesc A Trigger sub-class that defines a trigger that changes
@@ -1473,14 +1462,21 @@ Nadion.StateMachine.prototype.reset = function()
 		Nadion.Trigger.call( this, game, name, x, y, width, height, props );
 
 		// fields
+		this.game = game;
 		this.game_state = game.state.states[game.state.current];
 		this.map = this.game_state.map;
 		this.noise = game.add.audio( 'click', 1, true );
 		this.volume = this.game_state.sounds[2].volume;
 		this.old_tile = undefined;
+		this.old_trigger_tile = undefined;
 		this.new_tile = +(props['new_tile']);
 		this.target_x = +(props['target_x']);
 		this.target_y = +(props['target_y']);
+		this.new_trigger_tile = undefined;
+		if( 'new_trigger_tile' in props )
+			this.new_trigger_tile = +props['new_trigger_tile'];
+		this.trigger_tile_x = undefined;
+		this.trigger_tile_y = undefined;
 		props['on'] = 'on';
 		props['off'] = 'off';
 		this.target = this;
@@ -1498,8 +1494,13 @@ Nadion.StateMachine.prototype.reset = function()
 		// have we been triggered yet?
 		if( this.old_tile !== undefined )
 		{
-			this.map.setLayer( this.game_state.main_layer_index );
-			this.map.putTile( this.old_tile, this.target_x, this.target_y );
+//			this.map.setLayer( this.game_state.main_layer_index );
+//			this.map.putTile( this.old_tile, this.target_x, this.target_y );
+			this.map.putTile( this.old_tile, this.target_x, this.target_y, this.game_state.main_layer_index );
+		}
+		if( this.old_trigger_tile !== undefined )
+		{
+			this.map.putTile( this.old_trigger_tile, this.trigger_tile_x, this.trigger_tile_y, this.game_state.main_layer_index );
 		}
 	};
 	/** Turn on the Trigger
@@ -1508,12 +1509,28 @@ Nadion.StateMachine.prototype.reset = function()
 	 */
 	Nadion.SetTileTrigger.prototype.on = function()
 	{ 
-		this.map.setLayer( this.game_state.main_layer_index );
-		this.old_tile = this.map.getTile( this.target_x, this.target_y );
-		this.map.putTile( this.new_tile, this.target_x, this.target_y );
+//		this.map.setLayer( this.game_state.main_layer_index );
+		// save the original tile 
+		if( this.old_tile === undefined )
+		{
+			this.old_tile = this.map.getTile( this.target_x, this.target_y, this.game_state.main_layer_index );
+		}
+		// save the original trigger tile & position
+		if( this.new_trigger_tile !== undefined && this.old_trigger_tile === undefined )
+		{
+			this.trigger_tile_x = this.game.math.snapToFloor( this.x, this.game_state.main_layer.tileWidth ) / this.game_state.main_layer.tileWidth;
+			this.trigger_tile_y = this.game.math.snapToFloor( this.y, this.game_state.main_layer.tileHeight ) / this.game_state.main_layer.tileHeight;
+			this.old_trigger_tile = this.map.getTile( this.trigger_tile_x, this.trigger_tile_y, this.game_state.main_layer_index );
+		}
+
+		// set the new tile
+		this.map.putTile( this.new_tile, this.target_x, this.target_y, this.game_state.main_layer_index );
+		// set the new trigger tile
+		if( this.new_trigger_tile )
+			this.map.putTile( this.new_trigger_tile, this.trigger_tile_x, this.trigger_tile_y, this.game_state.main_layer_index );
 		this.noise.play( '', 0, this.volume );
-		// TODO: this no longer seems to be causing a redraw
-		// cause a redraw and 'shake' the camera
+		// TODO: this doesn't actually work that well
+		// 'shake' the camera
 		this.map.game.camera.x++;
 		this.map.game.camera.x--;
 		return true;
@@ -1524,12 +1541,15 @@ Nadion.StateMachine.prototype.reset = function()
 	 */
 	Nadion.SetTileTrigger.prototype.off = function( target )
 	{ 
-		this.map.setLayer( this.game_state.main_layer_index );
-		this.map.putTile( this.old_tile, this.target_x, this.target_y );
+//		this.map.setLayer( this.game_state.main_layer_index );
+		this.map.putTile( this.old_tile, this.target_x, this.target_y, this.game_state.main_layer_index );
+		// reset the trigger tile, if we changed it
+		if( this.new_trigger_tile )
+			this.map.putTile( this.old_trigger_tile, this.trigger_tile_x, this.trigger_tile_y, this.game_state.main_layer_index );
 		// TODO: get the sound & volume from the Tiled props...
 		this.noise.play( '', 0, 0.5 );
-		// TODO: this no longer seems to be causing a redraw
-		// cause a redraw and 'shake' the camera
+		// TODO: this doesn't actually work that well
+		// 'shake' the camera
 		this.map.game.camera.x += 4;
 		this.map.game.camera.x -= 4;
 		return true;
