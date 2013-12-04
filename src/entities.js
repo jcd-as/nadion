@@ -247,6 +247,15 @@
 	 * @class Nadion#Nadion.SetTileTrigger
 	 * @classdesc A Trigger sub-class that defines a trigger that changes
 	 * the value of a tile on the tile map when it is activated.
+	 *
+	 * <p>Tiled properties:</p>
+	 * <ul>
+	 * <li>target_x: x coordinate of the target tile</li>
+	 * <li>target_y: y coordinate of the target tile</li>
+	 * <li>new_tile: The index of the tile that will replace the target tile</li>
+	 * <li>new_trigger_tile: The index of the tile that will replace the tile at the trigger's location (so the player can see the trigger state)</li>
+	 * <li>trigger_on_touch: boolean - Is this trigger turned on merely by contacting it</li>
+	 * </ul>
 	 * 
 	 * @constructor
 	 * @arg {Phaser.Game} game
@@ -360,6 +369,10 @@
 	 * @classdesc A Trigger sub-class that defines a trigger that starts the
 	 * next level of the game.
 	 * 
+	 * <p>Tiled properties:</p>
+	 * <ul>
+	 * <li>level: The index of the level (state) to start</li>
+	 * </ul>
 	 * @constructor
 	 * @arg {Phaser.Game} game
 	 * @arg {string} key Key for Phaser cache storage
@@ -465,6 +478,12 @@
 	 * @classdesc A Trigger sub-class that defines a trigger that teleports
 	 * the player sprite to a given position.
 	 * 
+	 * <p>Tiled properties:</p>
+	 * <ul>
+	 * <li>new_x: The x coordinate of the location to teleport the player to</li>
+	 * <li>new_y: The y coordinate of the location to teleport the player to</li>
+	 * </ul>
+	 *
 	 * @constructor
 	 * @arg {Phaser.Game} game
 	 * @arg {string} key Key for Phaser cache storage
