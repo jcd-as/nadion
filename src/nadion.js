@@ -44,22 +44,9 @@ var Nadion = Nadion ||
 	 * @constant {number} Nadion#VIEW_HEIGHT */
 	VIEW_HEIGHT : 480,
 
-	// game constants, to be left constant
 
-	// directions
-	/** Direction: up
-	 * @constant {number} Nadion#UP */
-	UP : 0,
-	/** Direction: right
-	 * @constant {number} Nadion#RIGHT */
-	RIGHT : 1,
-	/** Direction: down
-	 * @constant {number} Nadion#DOWN */
-	DOWN: 2, 
-	/** Direction: left
-	 * @constant {number} Nadion#LEFT */
-	LEFT: 3,
-	
+	// methods:
+
 	/**
 	 * main entry point for Nadion-based game
 	 * @function Nadion#go

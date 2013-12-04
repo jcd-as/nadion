@@ -58,16 +58,16 @@ var Nadion = Nadion ||
 	// directions
 	/** Direction: up
 	 * @constant {number} Nadion#UP */
-	UP : 0,
-	/** Direction: right
-	 * @constant {number} Nadion#RIGHT */
-	RIGHT : 1,
-	/** Direction: down
-	 * @constant {number} Nadion#DOWN */
-	DOWN: 2, 
-	/** Direction: left
-	 * @constant {number} Nadion#LEFT */
-	LEFT: 3,
+//	UP : 0,
+//	/** Direction: right
+//	 * @constant {number} Nadion#RIGHT */
+//	RIGHT : 1,
+//	/** Direction: down
+//	 * @constant {number} Nadion#DOWN */
+//	DOWN: 2, 
+//	/** Direction: left
+//	 * @constant {number} Nadion#LEFT */
+//	LEFT: 3,
 	
 	/**
 	 * main entry point for Nadion-based game
@@ -1428,7 +1428,6 @@ Nadion.StateMachine.prototype.reset = function()
 	 */
 	Nadion.Trigger.prototype.check = function()
 	{
-//		return this.game.physics.overlap( this, this.entity );
 		return Phaser.Rectangle.intersects( this.body, this.entity.body );
 	};
 	/** Check to see if the Trigger can be activated, and activate if so
@@ -2145,7 +2144,6 @@ Nadion.StateMachine.prototype.reset = function()
 		}
 
 		// has the entity entered/left the area?
-//		var collide = this.game.physics.overlap( this, this.entity );
 		var collide = Phaser.Rectangle.intersects( this.body, this.entity.body );
 
 		// entered

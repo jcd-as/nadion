@@ -90,7 +90,7 @@
 
 		// fields
 		var game_state = this.game.state.states[this.game.state.current];
-		this.facing = Nadion.RIGHT;
+		this.facing = Phaser.RIGHT;
 		this.stunned_timer = 0;
 		this.stunned_timeout = 500;
 		this.time = game.time;
@@ -127,7 +127,7 @@
 		this.y = this.initial_y;
 		this.body.velocity.x = 0;
 		this.body.velocity.y = 0;
-		this.facing = Nadion.RIGHT;
+		this.facing = Phaser.RIGHT;
 		this.stunned_timer = 0;
 		this.body.velocity.x = 0;
 		this.body.velocity.y = 0;
@@ -139,7 +139,7 @@
 	{
 		this.animations.stop();
 		this.frame = 0;
-		if( this.facing == Nadion.LEFT )
+		if( this.facing == Phaser.LEFT )
 		{
 			this.scale.x = -1;
 		}
@@ -150,7 +150,7 @@
 	};
 	MyGame.Player.prototype.walking = function()
 	{
-		if( this.facing == Nadion.LEFT )
+		if( this.facing == Phaser.LEFT )
 		{
 			this.walkLeft();
 		}
@@ -177,7 +177,7 @@
 		this.stunned_timer = this.time.now;
 		// TODO: frames/animation for stunned state
 		this.frame = 3;
-		if( this.facing == Nadion.LEFT )
+		if( this.facing == Phaser.LEFT )
 		{
 			this.scale.x = -1;
 		}
@@ -273,12 +273,12 @@
 				this.fsm.consumeEvent( 'jump' );
 			else if( left )
 			{
-				this.facing = Nadion.LEFT;
+				this.facing = Phaser.LEFT;
 				this.fsm.consumeEvent( 'left' );
 			}
 			else if( right )
 			{
-				this.facing = Nadion.RIGHT;
+				this.facing = Phaser.RIGHT;
 				this.fsm.consumeEvent( 'right' );
 			}
 			break;
@@ -340,7 +340,7 @@
 	{
 		this.scale.x = 1;
 		this.animations.stop();
-		this.facing = Nadion.RIGHT;
+		this.facing = Phaser.RIGHT;
 		this.body.velocity.x = this.walk_velocity;
 	};
 
@@ -350,7 +350,7 @@
 		// flip on x axis
 		this.scale.x = -1;
 		this.animations.stop();
-		this.facing = Nadion.LEFT;
+		this.facing = Phaser.LEFT;
 		this.body.velocity.x = -this.walk_velocity;
 	};
 
@@ -358,7 +358,7 @@
 	{
 		this.body.velocity.y -= this.jump_increment;
 		// what direction are we facing
-		if( this.facing == Nadion.LEFT )
+		if( this.facing == Phaser.LEFT )
 		{
 		// flip on x axis
 			this.scale.x = -1;
