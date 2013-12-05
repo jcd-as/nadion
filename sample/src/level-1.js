@@ -82,7 +82,13 @@
 				name: 'main-music-loop',
 				url: 'assets/snd/bodenstaendig_2000_in_rock_4bit',
 				volume: 0.5 
+			},
+			{
+				name: 'phaser',
+				url: 'assets/snd/phaser',
+				volume: 0.5
 			}
+		
 		];
 		// background music/soundtrack
 		var bg_music_idx = Nadion.findNamedItemInArray( this.sounds, 'main-music-loop' );

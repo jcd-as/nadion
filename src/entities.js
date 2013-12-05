@@ -275,8 +275,6 @@
 		this.game = game;
 		this.game_state = game.state.states[game.state.current];
 		this.map = this.game_state.map;
-		this.noise = game.add.audio( 'click', 1, true );
-		this.volume = this.game_state.sounds[2].volume;
 		this.old_tile = undefined;
 		this.old_trigger_tile = undefined;
 		this.new_tile = +(props['new_tile']);
@@ -287,6 +285,12 @@
 			this.new_trigger_tile = +props['new_trigger_tile'];
 		this.trigger_tile_x = undefined;
 		this.trigger_tile_y = undefined;
+		this.sound_effect = props['sound_effect'];
+		if( this.sound_effect )
+			this.noise = game.add.audio( this.sound_effect, 1, true );
+		this.volume = 1;
+		if( 'volume' in props )
+			this.volume = +props['volume'];
 		props['on'] = 'on';
 		props['off'] = 'off';
 		this.target = this;
@@ -335,7 +339,8 @@
 		// set the new trigger tile
 		if( this.new_trigger_tile )
 			this.map.putTile( this.new_trigger_tile, this.trigger_tile_x, this.trigger_tile_y, this.game_state.main_layer_index );
-		this.noise.play( '', 0, this.volume );
+		if( this.noise )
+			this.noise.play( '', 0, this.volume );
 		// TODO: this doesn't actually work that well
 		// 'shake' the camera
 		this.map.game.camera.x++;

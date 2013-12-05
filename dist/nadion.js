@@ -1446,6 +1446,15 @@ Nadion.StateMachine.prototype.reset = function()
 	 * @class Nadion#Nadion.SetTileTrigger
 	 * @classdesc A Trigger sub-class that defines a trigger that changes
 	 * the value of a tile on the tile map when it is activated.
+	 *
+	 * <p>Tiled properties:</p>
+	 * <ul>
+	 * <li>target_x: x coordinate of the target tile</li>
+	 * <li>target_y: y coordinate of the target tile</li>
+	 * <li>new_tile: The index of the tile that will replace the target tile</li>
+	 * <li>new_trigger_tile: The index of the tile that will replace the tile at the trigger's location (so the player can see the trigger state)</li>
+	 * <li>trigger_on_touch: boolean - Is this trigger turned on merely by contacting it</li>
+	 * </ul>
 	 * 
 	 * @constructor
 	 * @arg {Phaser.Game} game
@@ -1465,8 +1474,6 @@ Nadion.StateMachine.prototype.reset = function()
 		this.game = game;
 		this.game_state = game.state.states[game.state.current];
 		this.map = this.game_state.map;
-		this.noise = game.add.audio( 'click', 1, true );
-		this.volume = this.game_state.sounds[2].volume;
 		this.old_tile = undefined;
 		this.old_trigger_tile = undefined;
 		this.new_tile = +(props['new_tile']);
@@ -1477,6 +1484,15 @@ Nadion.StateMachine.prototype.reset = function()
 			this.new_trigger_tile = +props['new_trigger_tile'];
 		this.trigger_tile_x = undefined;
 		this.trigger_tile_y = undefined;
+		// TODO: pick audio up from Tiled props...
+//		this.noise = game.add.audio( 'click', 1, true );
+//		this.volume = this.game_state.sounds[2].volume;
+		this.sound_effect = props['sound_effect'];
+		if( this.sound_effect )
+			this.noise = game.add.audio( this.sound_effect, 1, true );
+		this.volume = 1;
+		if( 'volume' in props )
+			this.volume = +props['volume'];
 		props['on'] = 'on';
 		props['off'] = 'off';
 		this.target = this;
@@ -1494,8 +1510,6 @@ Nadion.StateMachine.prototype.reset = function()
 		// have we been triggered yet?
 		if( this.old_tile !== undefined )
 		{
-//			this.map.setLayer( this.game_state.main_layer_index );
-//			this.map.putTile( this.old_tile, this.target_x, this.target_y );
 			this.map.putTile( this.old_tile, this.target_x, this.target_y, this.game_state.main_layer_index );
 		}
 		if( this.old_trigger_tile !== undefined )
@@ -1509,7 +1523,6 @@ Nadion.StateMachine.prototype.reset = function()
 	 */
 	Nadion.SetTileTrigger.prototype.on = function()
 	{ 
-//		this.map.setLayer( this.game_state.main_layer_index );
 		// save the original tile 
 		if( this.old_tile === undefined )
 		{
@@ -1528,7 +1541,8 @@ Nadion.StateMachine.prototype.reset = function()
 		// set the new trigger tile
 		if( this.new_trigger_tile )
 			this.map.putTile( this.new_trigger_tile, this.trigger_tile_x, this.trigger_tile_y, this.game_state.main_layer_index );
-		this.noise.play( '', 0, this.volume );
+		if( this.noise )
+			this.noise.play( '', 0, this.volume );
 		// TODO: this doesn't actually work that well
 		// 'shake' the camera
 		this.map.game.camera.x++;
@@ -1541,7 +1555,6 @@ Nadion.StateMachine.prototype.reset = function()
 	 */
 	Nadion.SetTileTrigger.prototype.off = function( target )
 	{ 
-//		this.map.setLayer( this.game_state.main_layer_index );
 		this.map.putTile( this.old_tile, this.target_x, this.target_y, this.game_state.main_layer_index );
 		// reset the trigger tile, if we changed it
 		if( this.new_trigger_tile )
@@ -1563,6 +1576,10 @@ Nadion.StateMachine.prototype.reset = function()
 	 * @classdesc A Trigger sub-class that defines a trigger that starts the
 	 * next level of the game.
 	 * 
+	 * <p>Tiled properties:</p>
+	 * <ul>
+	 * <li>level: The index of the level (state) to start</li>
+	 * </ul>
 	 * @constructor
 	 * @arg {Phaser.Game} game
 	 * @arg {string} key Key for Phaser cache storage
@@ -1668,6 +1685,12 @@ Nadion.StateMachine.prototype.reset = function()
 	 * @classdesc A Trigger sub-class that defines a trigger that teleports
 	 * the player sprite to a given position.
 	 * 
+	 * <p>Tiled properties:</p>
+	 * <ul>
+	 * <li>new_x: The x coordinate of the location to teleport the player to</li>
+	 * <li>new_y: The y coordinate of the location to teleport the player to</li>
+	 * </ul>
+	 *
 	 * @constructor
 	 * @arg {Phaser.Game} game
 	 * @arg {string} key Key for Phaser cache storage
