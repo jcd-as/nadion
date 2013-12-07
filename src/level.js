@@ -423,6 +423,7 @@
 		var layer = this.game.add.tilemapLayer( 0, 0, Nadion.VIEW_WIDTH, Nadion.VIEW_HEIGHT, this.tileset, this.map, layer_num );
 		layer.name = lyr.name;
 		layer.solid = lyr.properties !== undefined && (lyr.properties.solid == 'true' ? true : false); 
+		layer.visible = lyr.visible;
 		layer.scrollFactorX = sx;
 		layer.scrollFactorY = sy;
 		this.layers.push( layer );

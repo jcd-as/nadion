@@ -831,6 +831,7 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 		var layer = this.game.add.tilemapLayer( 0, 0, Nadion.VIEW_WIDTH, Nadion.VIEW_HEIGHT, this.tileset, this.map, layer_num );
 		layer.name = lyr.name;
 		layer.solid = lyr.properties !== undefined && (lyr.properties.solid == 'true' ? true : false); 
+		layer.visible = lyr.visible;
 		layer.scrollFactorX = sx;
 		layer.scrollFactorY = sy;
 		this.layers.push( layer );
@@ -886,7 +887,6 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 		var og = layer;
 		var group = this.game.add.group();
 		group.name = og.name || '';
-//		var group = this.game.add.group( null, og.name );
 		group.visible = og.visible === undefined ? true : og.visible;
 		group.alpha = +og.opacity || 1;
 		for( var i = 0; i < og.objects.length; i++ )
