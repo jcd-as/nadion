@@ -402,7 +402,8 @@
 		if( this.new_trigger_tile )
 			this.map.putTile( this.old_trigger_tile, this.trigger_tile_x, this.trigger_tile_y, this.game_state.main_layer_index );
 		// TODO: get the sound & volume from the Tiled props...
-		this.noise.play( '', 0, 0.5 );
+		if( this.noise )
+			this.noise.play( '', 0, 0.5 );
 		// TODO: this doesn't actually work that well
 		// 'shake' the camera
 		this.map.game.camera.x += 4;
