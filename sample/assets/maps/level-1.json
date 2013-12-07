@@ -102,12 +102,9 @@
                  "properties":
                     {
                      "entity":"chick",
-                     "new_tile":"16",
                      "new_tile_1":"{\"x\": 43, \"y\": 14, \"tile\": 16, \"layer\": \"main\"}",
                      "new_trigger_tile":"19",
                      "sound_effect":"phaser",
-                     "target_x":"43",
-                     "target_y":"14",
                      "trigger_on_touch":"true"
                     },
                  "type":"SetTileTrigger",
