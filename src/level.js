@@ -285,6 +285,11 @@
 					// solid?
 					if( val.solid !== undefined )
 					{
+						// TODO: should we use a separate property for slope??
+						if( val.solid === 'slopeDownRight' )
+							this.tileset.tiles[idx].slopeDownRight = true;
+						else if( val.solid === 'slopeDownLeft' )
+							this.tileset.tiles[idx].slopeDownLeft = true;
 						this.tileset.setCollision( idx, true, true, true, true );
 					}
 					else

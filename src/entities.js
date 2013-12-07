@@ -275,11 +275,24 @@
 		this.game = game;
 		this.game_state = game.state.states[game.state.current];
 		this.map = this.game_state.map;
-		this.old_tile = undefined;
 		this.old_trigger_tile = undefined;
-		this.new_tile = +(props['new_tile']);
-		this.target_x = +(props['target_x']);
-		this.target_y = +(props['target_y']);
+		this.new_tile_data = [];
+		this.tiles_saved = false;
+		var data = props['new_tile_1'];
+		var json = JSON.parse( data );
+		this.new_tile_data.push( json );
+		if( 'new_tile_2' in props )
+		{
+			data = props['new_tile_2'];
+			json = JSON.parse( data );
+			this.new_tile_data.push( json );
+		}
+		if( 'new_tile_3' in props )
+		{
+			data = props['new_tile_3'];
+			json = JSON.parse( data );
+			this.new_tile_data.push( json );
+		}
 		this.new_trigger_tile = undefined;
 		if( 'new_trigger_tile' in props )
 			this.new_trigger_tile = +props['new_trigger_tile'];
@@ -305,13 +318,19 @@
 	Nadion.SetTileTrigger.prototype.reset = function()
 	{
 		this.activated = false;
-		// have we been triggered yet?
-		if( this.old_tile !== undefined )
+		if( this.tiles_saved )
 		{
-			this.map.putTile( this.old_tile, this.target_x, this.target_y, this.game_state.main_layer_index );
-		}
-		if( this.old_trigger_tile !== undefined )
-		{
+			// reset all the tiles
+			for( var i = 0; i < this.new_tile_data.length; i++ )
+			{
+				// get the layer for this data
+				var l = Nadion.findNamedItemInArray( this.game_state.layers, this.new_tile_data[i].layer );
+				var x = +this.new_tile_data[i].x;
+				var y = +this.new_tile_data[i].y;
+				var old_tile = +this.new_tile_data[i].old_tile;
+				this.map.putTile( old_tile, x, y, l );
+			}
+			// reset the trigger tile
 			this.map.putTile( this.old_trigger_tile, this.trigger_tile_x, this.trigger_tile_y, this.game_state.main_layer_index );
 		}
 	};
@@ -321,10 +340,18 @@
 	 */
 	Nadion.SetTileTrigger.prototype.on = function()
 	{ 
-		// save the original tile 
-		if( this.old_tile === undefined )
+		// save the original tiles
+		if( this.old_trigger_tile === undefined )
 		{
-			this.old_tile = this.map.getTile( this.target_x, this.target_y, this.game_state.main_layer_index );
+			for( var i = 0; i < this.new_tile_data.length; i++ )
+			{
+				// get the layer for this data
+				var l = Nadion.findNamedItemInArray( this.game_state.layers, this.new_tile_data[i].layer );
+				var x = +this.new_tile_data[i].x;
+				var y = +this.new_tile_data[i].y;
+				this.new_tile_data[i].old_tile = this.map.getTile( x, y, l );
+			}
+			this.tiles_saved = true;
 		}
 		// save the original trigger tile & position
 		if( this.new_trigger_tile !== undefined && this.old_trigger_tile === undefined )
@@ -334,8 +361,16 @@
 			this.old_trigger_tile = this.map.getTile( this.trigger_tile_x, this.trigger_tile_y, this.game_state.main_layer_index );
 		}
 
-		// set the new tile
-		this.map.putTile( this.new_tile, this.target_x, this.target_y, this.game_state.main_layer_index );
+		// set the new tiles
+		for( var i = 0; i < this.new_tile_data.length; i++ )
+		{
+			// get the layer for this data
+			var l = Nadion.findNamedItemInArray( this.game_state.layers, this.new_tile_data[i].layer );
+			var x = +this.new_tile_data[i].x;
+			var y = +this.new_tile_data[i].y;
+			var new_tile = +this.new_tile_data[i].tile;
+			this.map.putTile( new_tile, x, y, l );
+		}
 		// set the new trigger tile
 		if( this.new_trigger_tile )
 			this.map.putTile( this.new_trigger_tile, this.trigger_tile_x, this.trigger_tile_y, this.game_state.main_layer_index );
@@ -353,7 +388,16 @@
 	 */
 	Nadion.SetTileTrigger.prototype.off = function( target )
 	{ 
-		this.map.putTile( this.old_tile, this.target_x, this.target_y, this.game_state.main_layer_index );
+		// reset all the tiles
+		for( var i = 0; i < this.new_tile_data.length; i++ )
+		{
+			// get the layer for this data
+			var l = Nadion.findNamedItemInArray( this.game_state.layers, this.new_tile_data[i].layer );
+			var x = +this.new_tile_data[i].x;
+			var y = +this.new_tile_data[i].y;
+			var old_tile = +this.new_tile_data[i].old_tile;
+			this.map.putTile( old_tile, x, y, l );
+		}
 		// reset the trigger tile, if we changed it
 		if( this.new_trigger_tile )
 			this.map.putTile( this.old_trigger_tile, this.trigger_tile_x, this.trigger_tile_y, this.game_state.main_layer_index );
