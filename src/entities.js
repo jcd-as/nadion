@@ -663,11 +663,13 @@
 	{ 
 		// record time
 		this.activated_time = this.game.time.now;
+		// TODO: freeze *all* sprites ??
 		// freeze the player
 		if( this.state.player )
 		{
 			this.state.player.body.velocity.x = 0;
 			this.state.player.body.velocity.y = 0;
+			this.state.player.exists = false;
 		}
 		this.fadeOut();
 		return true;
