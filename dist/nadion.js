@@ -782,7 +782,11 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 			switch( lyr.type )
 			{
 			case 'tilelayer':
-				this.createTileLayer( lyr, tilemaplayer_count++ );
+				// don't create 'excluded' layers (layers excluded for reasons
+				// of performance - detail level - etc)
+				if( !this.game.excluded_layers || this.game.excluded_layers && this.game.excluded_layers.indexOf( lyr.name ) === -1 )
+					this.createTileLayer( lyr, tilemaplayer_count );
+				tilemaplayer_count++;
 				break;
 			case 'objectgroup':
 				this.createObjects( lyr );
@@ -907,6 +911,10 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 				throw new Error( "Unable to create Object: '" + obj.type + "'" );
 			var o = new f( this.game, obj.name, obj.x, obj.y, obj.width, obj.height, obj.properties );
 
+			// if we failed to create the object, keep going
+			if( typeof o === 'undefined' || o === null )
+				continue;
+
 			if( o.is_player_sprite )
 				this.player = o;
 			// TODO: this really ought be be checking against
@@ -1009,7 +1017,9 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 			if( !this[lyr_name] )
 				this.layers[i].visible = false;
 			else
-				this.layers[i].visible = true;
+				// don't ever make 'collision' layer visible
+				if( this.layers[i].name !== 'collision' )
+					this.layers[i].visible = true;
 		}
 
 		// update player
@@ -1853,9 +1863,7 @@ Nadion.StateMachine.prototype.reset = function()
 	 */
 	Nadion.ResetLevelTrigger.prototype.resetLevel = function()
 	{ 
-		// freeze the player
-		this.state.player.body.velocity.x = 0;
-		this.state.player.body.velocity.y = 0;
+		// restart the state
 		this.state.restart();
 		// allow re-use
 		this.bg.alive = false;
@@ -1870,6 +1878,12 @@ Nadion.StateMachine.prototype.reset = function()
 	{ 
 		// record time
 		this.activated_time = this.game.time.now;
+		// freeze the player
+		if( this.state.player )
+		{
+			this.state.player.body.velocity.x = 0;
+			this.state.player.body.velocity.y = 0;
+		}
 		this.fadeOut();
 		return true;
 	};
@@ -1901,6 +1915,8 @@ Nadion.StateMachine.prototype.reset = function()
 	 * @class Nadion#Nadion.Emitter
 	 * @classdesc Extension of Phaser Emitter for creation from Tiled files.
 	 *
+	 * (NOTE: if the 'use_particle_effects' property on the Phaser game object is set to 'false' emitters will not be created. This is a way to control the detail level / performance of your game.)
+	 *
 	 * <p>Tiled properties:</p>
 	 * <ul>
 	 * <li>period: Number of milliseconds that each particle lives, once emitted.  (Inifinite if === 0)</li>
@@ -1929,6 +1945,9 @@ Nadion.StateMachine.prototype.reset = function()
 	 */
 	Nadion.Emitter = function( game, name, x, y, width, height, props )
 	{
+		if( game.use_particle_effects === false )
+			return null;
+
 		// don't call the game.add helper, because we need to set the name of
 		// the emitter *before* it is added
 		var emitter = new Phaser.Particles.Arcade.Emitter( game, 0, 0, +(props['quantity']) );

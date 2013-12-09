@@ -374,7 +374,11 @@
 			switch( lyr.type )
 			{
 			case 'tilelayer':
-				this.createTileLayer( lyr, tilemaplayer_count++ );
+				// don't create 'excluded' layers (layers excluded for reasons
+				// of performance - detail level - etc)
+				if( !this.game.excluded_layers || this.game.excluded_layers && this.game.excluded_layers.indexOf( lyr.name ) === -1 )
+					this.createTileLayer( lyr, tilemaplayer_count );
+				tilemaplayer_count++;
 				break;
 			case 'objectgroup':
 				this.createObjects( lyr );
@@ -499,6 +503,10 @@
 				throw new Error( "Unable to create Object: '" + obj.type + "'" );
 			var o = new f( this.game, obj.name, obj.x, obj.y, obj.width, obj.height, obj.properties );
 
+			// if we failed to create the object, keep going
+			if( typeof o === 'undefined' || o === null )
+				continue;
+
 			if( o.is_player_sprite )
 				this.player = o;
 			// TODO: this really ought be be checking against
@@ -601,7 +609,9 @@
 			if( !this[lyr_name] )
 				this.layers[i].visible = false;
 			else
-				this.layers[i].visible = true;
+				// don't ever make 'collision' layer visible
+				if( this.layers[i].name !== 'collision' )
+					this.layers[i].visible = true;
 		}
 
 		// update player

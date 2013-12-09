@@ -648,9 +648,7 @@
 	 */
 	Nadion.ResetLevelTrigger.prototype.resetLevel = function()
 	{ 
-		// freeze the player
-		this.state.player.body.velocity.x = 0;
-		this.state.player.body.velocity.y = 0;
+		// restart the state
 		this.state.restart();
 		// allow re-use
 		this.bg.alive = false;
@@ -665,6 +663,12 @@
 	{ 
 		// record time
 		this.activated_time = this.game.time.now;
+		// freeze the player
+		if( this.state.player )
+		{
+			this.state.player.body.velocity.x = 0;
+			this.state.player.body.velocity.y = 0;
+		}
 		this.fadeOut();
 		return true;
 	};
@@ -696,6 +700,8 @@
 	 * @class Nadion#Nadion.Emitter
 	 * @classdesc Extension of Phaser Emitter for creation from Tiled files.
 	 *
+	 * (NOTE: if the 'use_particle_effects' property on the Phaser game object is set to 'false' emitters will not be created. This is a way to control the detail level / performance of your game.)
+	 *
 	 * <p>Tiled properties:</p>
 	 * <ul>
 	 * <li>period: Number of milliseconds that each particle lives, once emitted.  (Inifinite if === 0)</li>
@@ -724,6 +730,9 @@
 	 */
 	Nadion.Emitter = function( game, name, x, y, width, height, props )
 	{
+		if( game.use_particle_effects === false )
+			return null;
+
 		// don't call the game.add helper, because we need to set the name of
 		// the emitter *before* it is added
 		var emitter = new Phaser.Particles.Arcade.Emitter( game, 0, 0, +(props['quantity']) );
