@@ -442,8 +442,7 @@
 	{
 		var bg = this.game.add.sprite( 0, 0, lyr.name );
 		bg.name = lyr.name;
-		var sx = +((lyr.properties && lyr.properties.scrollFactorX) || 1);
-		var sy = +((lyr.properties && lyr.properties.scrollFactorY) || 1);
+		var sx = 0, sy = 0;
 
 		// scroll factor formula
 		// sf = (layer_size - screen_size) / (world_size - screen_size)
@@ -456,8 +455,10 @@
 		var camera_max_y = h - Nadion.VIEW_HEIGHT;
 
 		// set scroll factor based on scale (sizes):
-		sx = (bg.width - Nadion.VIEW_WIDTH) / camera_max_x;
-		sy = (bg.height - Nadion.VIEW_HEIGHT) / camera_max_y;
+		if( camera_max_x !== 0 )
+			sx = (bg.width - Nadion.VIEW_WIDTH) / camera_max_x;
+		if( camera_max_y !== 0 )
+			sy = (bg.height - Nadion.VIEW_HEIGHT) / camera_max_y;
 
 		// override update so we can set the scrolling factor
 		bg.update = function() {

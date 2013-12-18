@@ -850,8 +850,9 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 	{
 		var bg = this.game.add.sprite( 0, 0, lyr.name );
 		bg.name = lyr.name;
-		var sx = +((lyr.properties && lyr.properties.scrollFactorX) || 1);
-		var sy = +((lyr.properties && lyr.properties.scrollFactorY) || 1);
+//		var sx = +((lyr.properties && lyr.properties.scrollFactorX) || 1);
+//		var sy = +((lyr.properties && lyr.properties.scrollFactorY) || 1);
+		var sx = 0, sy = 0;
 
 		// scroll factor formula
 		// sf = (layer_size - screen_size) / (world_size - screen_size)
@@ -864,8 +865,10 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 		var camera_max_y = h - Nadion.VIEW_HEIGHT;
 
 		// set scroll factor based on scale (sizes):
-		sx = (bg.width - Nadion.VIEW_WIDTH) / camera_max_x;
-		sy = (bg.height - Nadion.VIEW_HEIGHT) / camera_max_y;
+		if( camera_max_x !== 0 )
+			sx = (bg.width - Nadion.VIEW_WIDTH) / camera_max_x;
+		if( camera_max_y !== 0 )
+			sy = (bg.height - Nadion.VIEW_HEIGHT) / camera_max_y;
 
 		// override update so we can set the scrolling factor
 		bg.update = function() {
@@ -1878,11 +1881,13 @@ Nadion.StateMachine.prototype.reset = function()
 	{ 
 		// record time
 		this.activated_time = this.game.time.now;
+		// TODO: freeze *all* sprites ??
 		// freeze the player
 		if( this.state.player )
 		{
 			this.state.player.body.velocity.x = 0;
 			this.state.player.body.velocity.y = 0;
+			this.state.player.exists = false;
 		}
 		this.fadeOut();
 		return true;
