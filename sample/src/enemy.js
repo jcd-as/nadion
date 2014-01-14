@@ -22,10 +22,11 @@
 // THE SOFTWARE.
 
 
-"use strict";
-
 (function()
 {
+
+	"use strict";
+
 	///////////////////////////////////////////////////////////////////
 	// ENEMY
 	///////////////////////////////////////////////////////////////////
@@ -52,7 +53,8 @@
 
 		// fields
 		this.fsm = new Nadion.StateMachine( enemy_states, this );
-		this.jump_velocity = +(props['jump-velocity'] || 600);
+//		this.jump_velocity = +(props['jump-velocity'] || 600);
+		this.jump_velocity = 200;
 		this.time = this.game.time;
 		this.idle_time = this.time.now;
 		this.idle_period = +(props['idle-period'] || 1500);
@@ -60,7 +62,8 @@
 		// sprite fields
 		this.body.bounce.y = 0.0;
 		this.body.collideWorldBounds = true;
-		this.body.gravity.y = 20;
+//		this.body.gravity.y = 20;
+		this.body.gravity.y = 200;
 		this.body.maxVelocity.y = 1000;
 	};
 	MyGame.Enemy.prototype = Object.create( Nadion.BaseSprite );

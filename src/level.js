@@ -21,9 +21,10 @@
 // THE SOFTWARE.
 
 
-"use strict";
-
 (function() {
+
+	"use strict";
+
 
 	/** 
 	 * @class Nadion#Nadion.Level
@@ -83,8 +84,9 @@
 		// load tilemap
 		this.game.load.tilemap( 'level', this.tilemap, null, Phaser.Tilemap.TILED_JSON );
 
+		// TODO: load tileset images based on Tiled json...
 		// load tileset
-		this.game.load.tileset( 'tiles', this.tileset_url, this.tile_width, this.tile_height );
+		this.game.load.image( 'tiles', this.tileset_url, this.tile_width, this.tile_height );
 
 		// load spritesheets
 		for( i = 0; i < this.spritesheets.length; i++ )
@@ -188,9 +190,6 @@
 			this.game.add.existing( this.game.paused_image );
 		}
 
-		// setup the tile map
-		this.setupMap();
-
 		// setup pause/unpause
 		this.game.onPause.add( this.onPause, this );
 		this.game.onResume.add( this.onResume, this );
@@ -208,14 +207,15 @@
 		this.alarms = [];
 		this.areas = [];
 
-		// create the map layers
-		this.createLayers();
+		// setup the tile map
+		this.setupMap();
 
 		// set-up input
 		this.setupInput();
 
 		// set the camera to follow the player
-		this.game.camera.follow( this.player, Phaser.Camera.FOLLOW_PLATFORMER );
+//		this.game.camera.follow( this.player, Phaser.Camera.FOLLOW_PLATFORMER );
+		this.game.camera.follow( this.player, Phaser.Camera.FOLLOW_LOCKON );
 
 		this.updates = 0;
 
@@ -265,47 +265,64 @@
 	{
 		// add the tiled map for the level
 		this.map = this.game.add.tilemap( 'level' );
+
+		// create the map layers
+		this.createLayers();
+
 		// add the tileset
-		this.tileset = this.game.add.tileset( 'tiles' );
+		// TODO: get the key & tileset name from the json 
+		this.map.addTilesetImage( 'tiles', 'tiles' );
+
 		// set it's solid tiles (collidable)
 		var data = this.game.cache.getTilemapData( 'level' ).data;
 		// TODO: for now, assume we're using only the first tileset, since 
 		// Tiled and Phaser are a bit at odds in how to interpret the tile
 		// indices
-		var tileprops = data.tilesets[0].tileproperties;
-		var idx, val;
-		for( var key in tileprops )
+		for( var i = 0; i < data.tilesets.length; i++ )
 		{
-			if( tileprops.hasOwnProperty( key ) )
+			var tileprops = data.tilesets[i].tileproperties;
+			var idx, val;
+			var solid_tiles = [];
+			for( var key in tileprops )
 			{
-				idx = +key;
-				if( !isNaN( idx ) )
+				if( tileprops.hasOwnProperty( key ) )
 				{
-					val = tileprops[key];
-					// solid?
-					if( val.solid !== undefined )
+					idx = +key;
+					if( !isNaN( idx ) )
 					{
-						// TODO: should we use a separate property for slope??
-						if( val.solid === 'slopeDownRight' )
-							this.tileset.tiles[idx].slopeDownRight = true;
-						else if( val.solid === 'slopeDownLeft' )
-							this.tileset.tiles[idx].slopeDownLeft = true;
-						this.tileset.setCollision( idx, true, true, true, true );
-					}
-					else
-					{
-						var left = false, right = false, up = false, down = false;
-						if( val['solid-left'] !== undefined )
-							left = true;
-						if( val['solid-right'] !== undefined )
-							right = true;
-						if( val['solid-up'] !== undefined )
-							up = true;
-						if( val['solid-down'] !== undefined )
-							down = true;
-						this.tileset.setCollision( idx, left, right, up, down );
+						val = tileprops[key];
+						// solid?
+						if( val.solid !== undefined )
+						{
+							// TODO: should we use a separate property for slope??
+							if( val.solid === 'slopeDownRight' )
+								this.tileset.tiles[idx].slopeDownRight = true;
+							else if( val.solid === 'slopeDownLeft' )
+								this.tileset.tiles[idx].slopeDownLeft = true;
+							solid_tiles.push( idx+1 );
+						}
+//						else
+//						{
+//							var left = false, right = false, up = false, down = false;
+//							if( val['solid-left'] !== undefined )
+//								left = true;
+//							if( val['solid-right'] !== undefined )
+//								right = true;
+//							if( val['solid-up'] !== undefined )
+//								up = true;
+//							if( val['solid-down'] !== undefined )
+//								down = true;
+//							this.tileset.setCollision( idx, left, right, up, down );
+//						}
 					}
 				}
+			}
+			// TODO: allow tiles to be solid in only some layers...
+			for( var j = 0; j < this.layers.length; j++ )
+			{
+				// only set tiles as 'collide-able' on 'solid' layers
+				if( this.layers[j].solid )
+					this.map.setCollision( solid_tiles, this.layers[j].index );
 			}
 		}
 	};
@@ -416,7 +433,8 @@
 	 * @function Nadion.Level#createTileLayer
 	 * @memberof Nadion.Level
 	 * @arg {Object} lyr The layer object from Tiled
-	 * @arg {number} layer_num Index of the tile layer
+	 * @arg {number} layer_num Index of the tile layer in our (Nadion's) tile
+	 * layer array (only tile layers)
 	 */
 	Nadion.Level.prototype.createTileLayer = function( lyr, layer_num )
 	{
@@ -424,7 +442,7 @@
 		var sx = +((lyr.properties && lyr.properties.scrollFactorX) || 1);
 		var sy = +((lyr.properties && lyr.properties.scrollFactorY) || 1);
 		// get the name
-		var layer = this.game.add.tilemapLayer( 0, 0, Nadion.VIEW_WIDTH, Nadion.VIEW_HEIGHT, this.tileset, this.map, layer_num );
+		var layer = this.map.createLayer( layer_num );
 		layer.name = lyr.name;
 		layer.solid = lyr.properties !== undefined && (lyr.properties.solid == 'true' ? true : false); 
 		layer.visible = lyr.visible;
