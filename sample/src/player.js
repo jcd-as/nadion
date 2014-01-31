@@ -96,8 +96,8 @@
 		this.stunned_timeout = 500;
 		this.time = game.time;
 		this.fsm = new Nadion.StateMachine( player_states, this );
-//		this.jump_increment = 400;
-		this.jump_increment = 250;
+		this.jump_increment = 400;
+//		this.jump_increment = 250;
 		this.walk_velocity = 150;
 		this.recovery_timer = 0;
 		this.recovery_timeout = 150;
@@ -110,7 +110,7 @@
 		this.body.collideWorldBounds = true;
 		this.body.width = 16;
 //		this.body.gravity.y = 20;
-		this.body.gravity.y = 250;
+		this.body.gravity.y = 1000;
 		this.body.maxVelocity.y = this.jump_increment;
 		this.animations.add( 'jump-left', [3], 1, true );
 		this.animations.add( 'jump-right', [3], 1, true );

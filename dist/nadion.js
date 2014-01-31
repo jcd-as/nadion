@@ -429,9 +429,10 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 // THE SOFTWARE.
 
 
-"use strict";
-
 (function() {
+
+	"use strict";
+
 
 	/** 
 	 * @class Nadion#Nadion.Level
@@ -491,8 +492,9 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 		// load tilemap
 		this.game.load.tilemap( 'level', this.tilemap, null, Phaser.Tilemap.TILED_JSON );
 
+		// TODO: load tileset images based on Tiled json...
 		// load tileset
-		this.game.load.tileset( 'tiles', this.tileset_url, this.tile_width, this.tile_height );
+		this.game.load.image( 'tiles', this.tileset_url, this.tile_width, this.tile_height );
 
 		// load spritesheets
 		for( i = 0; i < this.spritesheets.length; i++ )
@@ -596,9 +598,6 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 			this.game.add.existing( this.game.paused_image );
 		}
 
-		// setup the tile map
-		this.setupMap();
-
 		// setup pause/unpause
 		this.game.onPause.add( this.onPause, this );
 		this.game.onResume.add( this.onResume, this );
@@ -616,14 +615,15 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 		this.alarms = [];
 		this.areas = [];
 
-		// create the map layers
-		this.createLayers();
+		// setup the tile map
+		this.setupMap();
 
 		// set-up input
 		this.setupInput();
 
 		// set the camera to follow the player
-		this.game.camera.follow( this.player, Phaser.Camera.FOLLOW_PLATFORMER );
+//		this.game.camera.follow( this.player, Phaser.Camera.FOLLOW_PLATFORMER );
+		this.game.camera.follow( this.player, Phaser.Camera.FOLLOW_LOCKON );
 
 		this.updates = 0;
 
@@ -673,47 +673,63 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 	{
 		// add the tiled map for the level
 		this.map = this.game.add.tilemap( 'level' );
+
+		// create the map layers
+		this.createLayers();
+
 		// add the tileset
-		this.tileset = this.game.add.tileset( 'tiles' );
+		// TODO: get the key & tileset name from the json 
+		this.map.addTilesetImage( 'tiles', 'tiles' );
+
 		// set it's solid tiles (collidable)
 		var data = this.game.cache.getTilemapData( 'level' ).data;
 		// TODO: for now, assume we're using only the first tileset, since 
 		// Tiled and Phaser are a bit at odds in how to interpret the tile
 		// indices
-		var tileprops = data.tilesets[0].tileproperties;
-		var idx, val;
-		for( var key in tileprops )
+		for( var i = 0; i < data.tilesets.length; i++ )
 		{
-			if( tileprops.hasOwnProperty( key ) )
+			var tileprops = data.tilesets[i].tileproperties;
+			var idx, val;
+			var solid_tiles = [];
+			for( var key in tileprops )
 			{
-				idx = +key;
-				if( !isNaN( idx ) )
+				if( tileprops.hasOwnProperty( key ) )
 				{
-					val = tileprops[key];
-					// solid?
-					if( val.solid !== undefined )
+					idx = +key;
+					if( !isNaN( idx ) )
 					{
-						// TODO: should we use a separate property for slope??
-						if( val.solid === 'slopeDownRight' )
-							this.tileset.tiles[idx].slopeDownRight = true;
-						else if( val.solid === 'slopeDownLeft' )
-							this.tileset.tiles[idx].slopeDownLeft = true;
-						this.tileset.setCollision( idx, true, true, true, true );
-					}
-					else
-					{
-						var left = false, right = false, up = false, down = false;
-						if( val['solid-left'] !== undefined )
-							left = true;
-						if( val['solid-right'] !== undefined )
-							right = true;
-						if( val['solid-up'] !== undefined )
-							up = true;
-						if( val['solid-down'] !== undefined )
-							down = true;
-						this.tileset.setCollision( idx, left, right, up, down );
+						val = tileprops[key];
+						// solid?
+						if( val.solid !== undefined )
+						{
+							// TODO: should we use a separate property for slope??
+//							if( val.solid === 'slopeDownRight' )
+//								this.tileset.tiles[idx].slopeDownRight = true;
+//							else if( val.solid === 'slopeDownLeft' )
+//								this.tileset.tiles[idx].slopeDownLeft = true;
+							solid_tiles.push( idx+1 );
+						}
+//						else
+//						{
+//							var left = false, right = false, up = false, down = false;
+//							if( val['solid-left'] !== undefined )
+//								left = true;
+//							if( val['solid-right'] !== undefined )
+//								right = true;
+//							if( val['solid-up'] !== undefined )
+//								up = true;
+//							if( val['solid-down'] !== undefined )
+//								down = true;
+//							this.tileset.setCollision( idx, left, right, up, down );
+//						}
 					}
 				}
+			}
+			for( var j = 0; j < this.layers.length; j++ )
+			{
+				// only set tiles as 'collide-able' on 'solid' layers
+				if( this.layers[j].solid )
+					this.map.setCollision( solid_tiles, this.layers[j].index );
 			}
 		}
 	};
@@ -824,7 +840,8 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 	 * @function Nadion.Level#createTileLayer
 	 * @memberof Nadion.Level
 	 * @arg {Object} lyr The layer object from Tiled
-	 * @arg {number} layer_num Index of the tile layer
+	 * @arg {number} layer_num Index of the tile layer in our (Nadion's) tile
+	 * layer array (only tile layers)
 	 */
 	Nadion.Level.prototype.createTileLayer = function( lyr, layer_num )
 	{
@@ -832,7 +849,7 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 		var sx = +((lyr.properties && lyr.properties.scrollFactorX) || 1);
 		var sy = +((lyr.properties && lyr.properties.scrollFactorY) || 1);
 		// get the name
-		var layer = this.game.add.tilemapLayer( 0, 0, Nadion.VIEW_WIDTH, Nadion.VIEW_HEIGHT, this.tileset, this.map, layer_num );
+		var layer = this.map.createLayer( layer_num );
 		layer.name = lyr.name;
 		layer.solid = lyr.properties !== undefined && (lyr.properties.solid == 'true' ? true : false); 
 		layer.visible = lyr.visible;
@@ -850,8 +867,6 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 	{
 		var bg = this.game.add.sprite( 0, 0, lyr.name );
 		bg.name = lyr.name;
-//		var sx = +((lyr.properties && lyr.properties.scrollFactorX) || 1);
-//		var sy = +((lyr.properties && lyr.properties.scrollFactorY) || 1);
 		var sx = 0, sy = 0;
 
 		// scroll factor formula
@@ -1240,10 +1255,10 @@ Nadion.StateMachine.prototype.reset = function()
 // THE SOFTWARE.
 
 
-"use strict";
-
 (function()
 {
+	"use strict";
+
 	///////////////////////////////////////////////////////////////////
 	// BASE SPRITE CLASS
 	///////////////////////////////////////////////////////////////////
@@ -1260,8 +1275,9 @@ Nadion.StateMachine.prototype.reset = function()
 	 * @arg {number} y Y position
 	 * @arg {number} width Width in pixels
 	 * @arg {number} height Height in pixels
+	 * @arg {Object} props Properties collection from Tiled
 	 */
-	Nadion.BaseSprite = function( game, key, name, x, y, width, height )
+	Nadion.BaseSprite = function( game, key, name, x, y, width, height, props )
 	{
 		// (account for anchor position when setting x & y )
 		x += width * 0.5;
@@ -1284,6 +1300,21 @@ Nadion.StateMachine.prototype.reset = function()
 		// in the correct position
 		this.x = this.initial_x;
 		this.y = this.initial_y;
+
+		// set any additional properties onto the new sprite object
+		if( props )
+		{
+			for( var k in props )
+			{
+				if( props.hasOwnProperty( k ) )
+				{
+					if( k !== 'name' &&
+						k !== 'initial_x' && 
+						k !== 'initial_y' )
+						this[k] = props[k];
+				}
+			}
+		}
 
 		game.add.existing( this );
 	};
@@ -1345,18 +1376,18 @@ Nadion.StateMachine.prototype.reset = function()
 		this.props = props || {};
 
 		// name of the entity to track against
-		this.entity_name = props['entity'];
+		this.entity_name = props.entity;
 		// name of the target of the callbacks
-		this.target_name = props['target'] || null;
+		this.target_name = props.target || null;
 
 		// function to call when the entity turns the trigger on
-		this.on_callback = props['on'];
+		this.on_callback = props.on;
 		// function to call when the entity turns the trigger off
-		this.off_callback = props['off'] || null;
+		this.off_callback = props.off || null;
 
-		this.type = props['type'] || 'Trigger';
+		this.type = props.type || 'Trigger';
 
-		this.trigger_on_touch = props['trigger_on_touch'] === 'true';
+		this.trigger_on_touch = props.trigger_on_touch === 'true';
 		this.activated = false;
 		// these must be set for phaser collision detection to work
 		this.exists = true;
@@ -1496,34 +1527,45 @@ Nadion.StateMachine.prototype.reset = function()
 		this.old_trigger_tile = undefined;
 		this.new_tile_data = [];
 		this.tiles_saved = false;
-		var data = props['new_tile_1'];
+
+		// TODO: need to check in *all* tilesets, not just the first one!
+		var tmdata = this.game.cache.getTilemapData( 'level' ).data;
+		var tileprops = tmdata.tilesets[0].tileproperties;
+
+		var data = props.new_tile_1;
 		var json = JSON.parse( data );
+		if( tileprops[json.tile] && tileprops[json.tile].solid )
+			json.solid = true;
 		this.new_tile_data.push( json );
 		if( 'new_tile_2' in props )
 		{
-			data = props['new_tile_2'];
+			data = props.new_tile_2;
 			json = JSON.parse( data );
+			if( tileprops[json.tile] && tileprops[json.tile].solid )
+				json.solid = true;
 			this.new_tile_data.push( json );
 		}
 		if( 'new_tile_3' in props )
 		{
-			data = props['new_tile_3'];
+			data = props.new_tile_3;
 			json = JSON.parse( data );
+			if( tileprops[json.tile] && tileprops[json.tile].solid )
+				json.solid = true;
 			this.new_tile_data.push( json );
 		}
 		this.new_trigger_tile = undefined;
 		if( 'new_trigger_tile' in props )
-			this.new_trigger_tile = +props['new_trigger_tile'];
+			this.new_trigger_tile = +props.new_trigger_tile;
 		this.trigger_tile_x = undefined;
 		this.trigger_tile_y = undefined;
-		this.sound_effect = props['sound_effect'];
+		this.sound_effect = props.sound_effect;
 		if( this.sound_effect )
 			this.noise = game.add.audio( this.sound_effect, 1, true );
 		this.volume = 1;
 		if( 'volume' in props )
-			this.volume = +props['volume'];
-		props['on'] = 'on';
-		props['off'] = 'off';
+			this.volume = +props.volume;
+		props.on = 'on';
+		props.off = 'off';
 		this.target = this;
 	};
 	Nadion.SetTileTrigger.prototype = Object.create( Nadion.Trigger );
@@ -1558,37 +1600,64 @@ Nadion.StateMachine.prototype.reset = function()
 	 */
 	Nadion.SetTileTrigger.prototype.on = function()
 	{ 
+		var i, l, t, x, y;
 		// save the original tiles
 		if( this.old_trigger_tile === undefined )
 		{
-			for( var i = 0; i < this.new_tile_data.length; i++ )
+			for( i = 0; i < this.new_tile_data.length; i++ )
 			{
 				// get the layer for this data
-				var l = Nadion.findNamedItemInArray( this.game_state.layers, this.new_tile_data[i].layer );
-				var x = +this.new_tile_data[i].x;
-				var y = +this.new_tile_data[i].y;
-				this.new_tile_data[i].old_tile = this.map.getTile( x, y, l );
+				l = Nadion.findNamedItemInArray( this.game_state.layers, this.new_tile_data[i].layer );
+				x = +this.new_tile_data[i].x;
+				y = +this.new_tile_data[i].y;
+				t = this.map.getTile( x, y, l );
+				if( t )
+					this.new_tile_data[i].old_tile = t;
 			}
 			this.tiles_saved = true;
 		}
 		// save the original trigger tile & position
 		if( this.new_trigger_tile !== undefined && this.old_trigger_tile === undefined )
 		{
-			this.trigger_tile_x = this.game.math.snapToFloor( this.x, this.game_state.main_layer.tileWidth ) / this.game_state.main_layer.tileWidth;
-			this.trigger_tile_y = this.game.math.snapToFloor( this.y, this.game_state.main_layer.tileHeight ) / this.game_state.main_layer.tileHeight;
-			this.old_trigger_tile = this.map.getTile( this.trigger_tile_x, this.trigger_tile_y, this.game_state.main_layer_index );
+//			this.trigger_tile_x = this.game.math.snapToFloor( this.x, this.game_state.main_layer.tileWidth ) / this.game_state.main_layer.tileWidth;
+//			this.trigger_tile_y = this.game.math.snapToFloor( this.y, this.game_state.main_layer.tileHeight ) / this.game_state.main_layer.tileHeight;
+			this.trigger_tile_x = this.game.math.snapToFloor( this.x, this.map.tileWidth ) / this.map.tileWidth;
+			this.trigger_tile_y = this.game.math.snapToFloor( this.y, this.map.tileHeight ) / this.map.tileHeight;
+			t = this.map.getTile( this.trigger_tile_x, this.trigger_tile_y, this.game_state.main_layer_index );
+			if( t )
+				this.old_trigger_tile = t;
 		}
 
 		// set the new tiles
-		for( var i = 0; i < this.new_tile_data.length; i++ )
+		for( i = 0; i < this.new_tile_data.length; i++ )
 		{
 			// get the layer for this data
-			var l = Nadion.findNamedItemInArray( this.game_state.layers, this.new_tile_data[i].layer );
-			var x = +this.new_tile_data[i].x;
-			var y = +this.new_tile_data[i].y;
-			var new_tile = +this.new_tile_data[i].tile;
+			l = Nadion.findNamedItemInArray( this.game_state.layers, this.new_tile_data[i].layer );
+			x = +this.new_tile_data[i].x;
+			y = +this.new_tile_data[i].y;
+//			var new_tile = +this.new_tile_data[i].tile;
+			var new_tile = this.new_tile_data[i].old_tile;
+			new_tile.index = +this.new_tile_data[i].tile;
+			if( this.new_tile_data[i].solid )
+			{
+				new_tile.collides = true;
+				new_tile.faceTop = true;
+				new_tile.faceBottom = true;
+				new_tile.faceLeft = true;
+				new_tile.faceRight = true;
+			}
+			else
+			{
+				new_tile.collides = false;
+				new_tile.faceTop = false;
+				new_tile.faceBottom = false;
+				new_tile.faceLeft = false;
+				new_tile.faceRight = false;
+			}
 			this.map.putTile( new_tile, x, y, l );
 		}
+		// TODO: set trigger tiles 'collide-ability' ??
+		// (do we need to? would trigger tiles *ever* be collide-able?)
 		// set the new trigger tile
 		if( this.new_trigger_tile )
 			this.map.putTile( this.new_trigger_tile, this.trigger_tile_x, this.trigger_tile_y, this.game_state.main_layer_index );
@@ -1656,15 +1725,15 @@ Nadion.StateMachine.prototype.reset = function()
 		Nadion.Trigger.call( this, game, name, x, y, width, height, props );
 
 		// fields
-		this.level = +(props['level']);
+		this.level = +(props.level);
 		this.state = game.state;
 		this.fade_color = 0x000000;
-		this.one_alpha = {alpha : 1}; 	// to prevent being GC'd during update
+		this.one_alpha = {alpha : 1};	// to prevent being GC'd during update
 		this.bg = this.game.add.graphics( 0, 0 );
 		this.bg.alive = false;
-		props['on'] = 'on';
+		props.on = 'on';
 		// trigger on touch by default
-		if( props['trigger_on_touch'] === undefined )
+		if( props.trigger_on_touch === undefined )
 			this.trigger_on_touch = true;
 	};
 	Nadion.NextLevelTrigger.prototype = Object.create( Nadion.Trigger );
@@ -1767,11 +1836,11 @@ Nadion.StateMachine.prototype.reset = function()
 		Nadion.Trigger.call( this, game, name, x, y, width, height, props );
 
 		// fields
-		this.new_x = +(props['new_x']);
-		this.new_y = +(props['new_y']);
-		props['on'] = 'on';
+		this.new_x = +(props.new_x);
+		this.new_y = +(props.new_y);
+		props.on = 'on';
 		// trigger on touch by default
-		if( props['trigger_on_touch'] === undefined )
+		if( props.trigger_on_touch === undefined )
 			this.trigger_on_touch = true;
 	};
 	Nadion.TeleportTrigger.prototype = Object.create( Nadion.Trigger );
@@ -1816,12 +1885,12 @@ Nadion.StateMachine.prototype.reset = function()
 		// fields
 		this.activated_time = 0;
 		this.fade_color = 0x000000;
-		this.one_alpha = {alpha : 1}; 	// to prevent being GC'd during update
+		this.one_alpha = {alpha : 1};	// to prevent being GC'd during update
 		this.bg = this.game.add.graphics( 0, 0 );
 		this.bg.alive = false;
 		this.state = game.state.states[game.state.current];
 		// trigger on touch by default
-		if( props['trigger_on_touch'] === undefined )
+		if( props.trigger_on_touch === undefined )
 			this.trigger_on_touch = true;
 	};
 	Nadion.ResetLevelTrigger.prototype = Object.create( Nadion.Trigger );
@@ -1955,7 +2024,7 @@ Nadion.StateMachine.prototype.reset = function()
 
 		// don't call the game.add helper, because we need to set the name of
 		// the emitter *before* it is added
-		var emitter = new Phaser.Particles.Arcade.Emitter( game, 0, 0, +(props['quantity']) );
+		var emitter = new Phaser.Particles.Arcade.Emitter( game, 0, 0, +(props.quantity) );
 		emitter.name = name;
 		game.particles.add( emitter );
 
@@ -1965,13 +2034,13 @@ Nadion.StateMachine.prototype.reset = function()
 		emitter.height = height;
 		emitter.width = width;
 
-		emitter.period = +(props['period'] || 0);
-		emitter.delay = +(props['delay'] || 0);
+		emitter.period = +(props.period || 0);
+		emitter.delay = +(props.delay || 0);
 
-		var image_key = props['image'];
+		var image_key = props.image;
 		if( !image_key )
 			console.error( "No image property on Nadion.Emitter object in level json!" );
-		var frames = props['frames'] || '0';
+		var frames = props.frames || '0';
 		frames = frames.split( ',' );
 		for( var i = 0; i < frames.length; i++ )
 		{
@@ -1982,18 +2051,18 @@ Nadion.StateMachine.prototype.reset = function()
 		// TODO: how to handle this requirement?
 		emitter.makeParticles( image_key, frames );
 
-		emitter.minParticleSpeed.x = +(props['minParticleSpeedX'] || 0);
-		emitter.minParticleSpeed.y = +(props['minParticleSpeedY'] || 0);
-		emitter.maxParticleSpeed.x = +(props['maxParticleSpeedX'] || 0);
-		emitter.maxParticleSpeed.y = +(props['maxParticleSpeedY'] || 0);
-		emitter.minRotation = +(props['minRotation'] || 0);
-		emitter.maxRotation = +(props['maxRotation'] || 0);
-		emitter.gravity = +(props['gravity'] || 0);
+		emitter.minParticleSpeed.x = +(props.minParticleSpeedX || 0);
+		emitter.minParticleSpeed.y = +(props.minParticleSpeedY || 0);
+		emitter.maxParticleSpeed.x = +(props.maxParticleSpeedX || 0);
+		emitter.maxParticleSpeed.y = +(props.maxParticleSpeedY || 0);
+		emitter.minRotation = +(props.minRotation || 0);
+		emitter.maxRotation = +(props.maxRotation || 0);
+		emitter.gravity = +(props.gravity || 0);
 
-		if( props['autostart'] === 'true' )
+		if( props.autostart === 'true' )
 			emitter.start( false, emitter.period, emitter.delay );
 
-		emitter.constrained = props['constrained'] === 'true';
+		emitter.constrained = props.constrained === 'true';
 		if( emitter.constrained )
 		{
 			// save the original coordinates
@@ -2024,7 +2093,7 @@ Nadion.StateMachine.prototype.reset = function()
 		emitter.reset = function()
 		{
 			this.kill();
-			if( props['autostart'] === 'true' )
+			if( props.autostart === 'true' )
 				emitter.start( false, emitter.period, emitter.delay );
 		};
 
@@ -2112,14 +2181,14 @@ Nadion.StateMachine.prototype.reset = function()
 		this.width = width || 1;
 		this.height = height || 1 ;
 		this.props = props || {};
-		this.target_name = props['target'] || null;
+		this.target_name = props.target || null;
 		// period of alarm timer, in milliseconds
-		this.period = props['period'] || 0;
+		this.period = props.period || 0;
 		// function to call when alarm is triggered
-		this.call = props['call'] || null;
+		this.call = props.call || null;
 
-		this.repeating = props['repeating'] || false;
-		this.type = props['type'] || 'Alarm';
+		this.repeating = props.repeating || false;
+		this.type = props.type || 'Alarm';
 
 		this.activated = false;
 		this.started = false;
@@ -2160,7 +2229,7 @@ Nadion.StateMachine.prototype.reset = function()
 					if( this.call && this.target[this.call] instanceof Function )
 						this.target[this.call]( this );
 					// otherwise try a general 'alarm' method
-					else if( this.target['alarm'] instanceof Function )
+					else if( this.target.alarm instanceof Function )
 						this.target.alarm( this );
 				}
 
@@ -2223,16 +2292,16 @@ Nadion.StateMachine.prototype.reset = function()
 		this.height = height || 1;
 		this.props = props || {};
 		// name of the entity to track against the area
-		this.entity_name = props['entity'];
+		this.entity_name = props.entity;
 		// name of the target of the call
-		this.target_name = props['target'] || null;
+		this.target_name = props.target || null;
 
 		// function to call when the entity is entering the area
-		this.on_enter = props['on_enter'];
+		this.on_enter = props.on_enter;
 		// function to call when the entity is leaving the area
-		this.on_exit = props['on_exit'];
+		this.on_exit = props.on_exit;
 
-		this.type = props['type'] || 'Area';
+		this.type = props.type || 'Area';
 
 		// is the entity currently inside
 		this.entity_inside = false;

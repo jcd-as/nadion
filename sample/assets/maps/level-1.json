@@ -1,5 +1,4 @@
-{ "backgroundcolor":"#020202",
- "height":32,
+{ "height":32,
  "layers":[
         {
          "height":32,
@@ -75,7 +74,6 @@
                      "quantity":"512"
                     },
                  "type":"Emitter",
-                 "visible":true,
                  "width":288,
                  "x":320,
                  "y":0
@@ -91,7 +89,6 @@
                      "target":"cat-emitter"
                     },
                  "type":"Area",
-                 "visible":true,
                  "width":32,
                  "x":448,
                  "y":80
@@ -108,7 +105,6 @@
                      "trigger_on_touch":"true"
                     },
                  "type":"SetTileTrigger",
-                 "visible":true,
                  "width":16,
                  "x":752,
                  "y":224
@@ -132,23 +128,9 @@
 
                     },
                  "type":"Player",
-                 "visible":true,
                  "width":16,
                  "x":0,
-                 "y":224
-                }, 
-                {
-                 "height":16,
-                 "name":"bad-cat",
-                 "properties":
-                    {
-                     "jump-velocity":"500"
-                    },
-                 "type":"Enemy",
-                 "visible":true,
-                 "width":16,
-                 "x":296,
-                 "y":224
+                 "y":200
                 }],
          "opacity":1,
          "type":"objectgroup",

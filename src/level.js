@@ -295,10 +295,10 @@
 						if( val.solid !== undefined )
 						{
 							// TODO: should we use a separate property for slope??
-							if( val.solid === 'slopeDownRight' )
-								this.tileset.tiles[idx].slopeDownRight = true;
-							else if( val.solid === 'slopeDownLeft' )
-								this.tileset.tiles[idx].slopeDownLeft = true;
+//							if( val.solid === 'slopeDownRight' )
+//								this.tileset.tiles[idx].slopeDownRight = true;
+//							else if( val.solid === 'slopeDownLeft' )
+//								this.tileset.tiles[idx].slopeDownLeft = true;
 							solid_tiles.push( idx+1 );
 						}
 //						else
@@ -317,7 +317,6 @@
 					}
 				}
 			}
-			// TODO: allow tiles to be solid in only some layers...
 			for( var j = 0; j < this.layers.length; j++ )
 			{
 				// only set tiles as 'collide-able' on 'solid' layers
