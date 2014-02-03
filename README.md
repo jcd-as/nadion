@@ -62,5 +62,5 @@ Please add them to the [Issue Tracker](https://github.com/jcd-as/nadion/issues) 
 License
 -------
 
-Nadion is released under the [MIT License](http://opensource.org/licenses/MIT).
+Nadion is released under the [MIT License](http://opensource.org/licenses/MIT).  (__Please__ __note__ that I personally __don't__ consider a minified javascript file to be a "source release" and I do __NOT__ care if you put the license into such a file. In other words - don't feel like you need to include the license text in your release javascript file!)
 
