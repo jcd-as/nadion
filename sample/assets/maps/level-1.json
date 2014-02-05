@@ -131,6 +131,18 @@
                  "width":16,
                  "x":0,
                  "y":200
+                }, 
+                {
+                 "height":16,
+                 "name":"bad-cat",
+                 "properties":
+                    {
+                     "jump-velocity":"500"
+                    },
+                 "type":"Enemy",
+                 "width":16,
+                 "x":296,
+                 "y":224
                 }],
          "opacity":1,
          "type":"objectgroup",

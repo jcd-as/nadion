@@ -92,6 +92,8 @@
 	{
 		this.frame = 1;
 		this.body.velocity.y = -this.jump_velocity;
+		this.body.blocked.down = false;
+		this.body.touching.down = false;
 	};
 
 	MyGame.Enemy.prototype.updateObject = function()
@@ -109,7 +111,8 @@
 		case 'jumping':
 			// can keep jumping or stop
 			// if we landed (on something), stop
-			if( this.body.touching.down )
+//			if( this.body.touching.down || this.body.blocked.down )
+			if( this.body.touching.down || this.body.blocked.down )
 				this.fsm.consumeEvent( 'stop' );
 			break;
 		case 'idle':

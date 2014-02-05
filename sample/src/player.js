@@ -239,8 +239,8 @@
 			if( jump && this.canJump() )
 				this.fsm.consumeEvent( 'jump' );
 			// not touching ground ?
-			else if( !this.body.touching.down )
-				this.fsm.consumeEvent( 'fall' );
+//			else if( !this.body.touching.down && !this.body.blocked.down )
+//				this.fsm.consumeEvent( 'fall' );
 			else if( left )
 				this.goLeft();
 			else if( right )
@@ -257,7 +257,7 @@
 			this.body.velocity.x = 0;
 
 			// land?
-			if( this.body.touching.down )
+			if( this.body.touching.down || this.body.blocked.down )
 			{
 				this.fsm.consumeEvent( 'land' );
 			}
@@ -360,6 +360,8 @@
 	MyGame.Player.prototype.jump = function()
 	{
 		this.body.velocity.y -= this.jump_increment;
+		this.body.blocked.down = false;
+		this.body.touching.down = false;
 		// what direction are we facing
 		if( this.facing == Phaser.LEFT )
 		{
