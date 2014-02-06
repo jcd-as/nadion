@@ -622,8 +622,7 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 		this.setupInput();
 
 		// set the camera to follow the player
-//		this.game.camera.follow( this.player, Phaser.Camera.FOLLOW_PLATFORMER );
-		this.game.camera.follow( this.player, Phaser.Camera.FOLLOW_LOCKON );
+		this.game.camera.follow( this.player, Phaser.Camera.FOLLOW_PLATFORMER );
 
 		this.updates = 0;
 
@@ -729,7 +728,7 @@ Nadion.Controls = function( game, screen_width, num_buttons )
 			{
 				// only set tiles as 'collide-able' on 'solid' layers
 				if( this.layers[j].solid )
-					this.map.setCollision( solid_tiles, this.layers[j].index );
+					this.map.setCollision( solid_tiles, true, this.layers[j].index );
 			}
 		}
 	};

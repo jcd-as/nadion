@@ -18,7 +18,7 @@
 *
 * Phaser - http://www.phaser.io
 *
-* v1.1.4 - Built at: Wed Feb 05 2014 11:09:40
+* v1.1.4 - Built at: Thu Feb 06 2014 14:25:37
 *
 * By Richard Davey http://www.photonstorm.com @photonstorm
 *
@@ -39637,7 +39637,7 @@ Phaser.Physics.Arcade.prototype = {
         {
             a.removeContact(b);
         }
-		return result;
+
     },
 
     /**
