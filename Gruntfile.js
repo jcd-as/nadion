@@ -35,18 +35,12 @@ module.exports = function (grunt) {
         dest: '<%= compile_dir %>/nadion.js'
       }
     },
-    umd: {
-      nadion: {
-        src: '<%= concat.nadion.dest %>',
-        dest: '<%= umd.nadion.src %>'
-      }
-    },
     uglify: {
       nadion: {
         options: {
           banner: '/*! Nadion v<%= pkg.version %> | (c) 2013 Joshua C Shepard */\n'
         },
-        src: ['<%= umd.nadion.dest %>'],
+        src: '<%= concat.nadion.dest %>',
         dest: '<%= compile_dir %>/nadion.min.js'
       }
     },
@@ -60,6 +54,6 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('default', ['build']);
-  grunt.registerTask('build', ['clean', 'concat', 'umd', 'uglify']);
+  grunt.registerTask('build', ['clean', 'concat', 'uglify']);
 
 };
