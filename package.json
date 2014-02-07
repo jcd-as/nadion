@@ -1,6 +1,6 @@
 {
   "name": "Nadion",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "An add-on to Phaser (http://phaser.io). Provides creation of entire game worlds in the Tiled editor (https://www.mapeditor.org) with very little code. Multiple scrolling layers, image layers, Sprites, Triggers, Emitters, Areas and Alarms can all be defined directly in Tiled.",
   "author": "Josh Shepard",
   "logo": "https://raw.github.com/jcd-as/nadion/master/nadion.png",

@@ -1,12 +1,3 @@
-!function(root, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(factory);
-  } else if (typeof exports === "object") {
-      module.exports = factory();
-  } else {
-    root.Nadion = factory();
-  }
-}(this, function() {
 // main object for Nadion
 //
 // Copyright 2013 Joshua C. Shepard
@@ -2348,5 +2339,3 @@ Nadion.StateMachine.prototype.reset = function()
 	};
 
 })();
-  return Nadion;
-});
