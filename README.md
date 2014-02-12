@@ -1,13 +1,13 @@
 Nadion
 =======
 
-current version: 0.2.0
+current version: 0.3.0
 
 author: Josh Shepard ([jcs](https://github.com/jcd-as))
 
-date: Feb. 6, 2014
+date: Feb. 12, 2014
 
-uses: Phaser 1.1.4
+uses: Phaser 1.1.5
 
 Nadion is an add-on to the [Phaser](http://phaser.io) HTML5 game framework, by Rich Davey ([Photon Storm](http://www.photonstorm.com)). It was originally pulled out of an in-progress platformer/scroller game as reusable and extensible elements became obvious. As more work went into these elements I thought that others might benefit from them as well.
 
