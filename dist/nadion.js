@@ -1602,7 +1602,11 @@ Nadion.StateMachine.prototype.reset = function()
 				y = +this.new_tile_data[i].y;
 				t = this.map.getTile( x, y, l );
 				if( t )
-					this.new_tile_data[i].old_tile = t;
+				{
+//					this.new_tile_data[i].old_tile = t;
+					this.new_tile_data[i].old_tile = new Phaser.Tile();
+					this.new_tile_data[i].old_tile.copy( t );
+				}
 			}
 			this.tiles_saved = true;
 		}
@@ -1615,7 +1619,11 @@ Nadion.StateMachine.prototype.reset = function()
 			this.trigger_tile_y = this.game.math.snapToFloor( this.y, this.map.tileHeight ) / this.map.tileHeight;
 			t = this.map.getTile( this.trigger_tile_x, this.trigger_tile_y, this.game_state.main_layer_index );
 			if( t )
-				this.old_trigger_tile = t;
+			{
+//				this.old_trigger_tile = t;
+				this.old_trigger_tile = new Phaser.Tile();
+				this.old_trigger_tile.copy( t );
+			}
 		}
 
 		// set the new tiles
@@ -1626,23 +1634,31 @@ Nadion.StateMachine.prototype.reset = function()
 			x = +this.new_tile_data[i].x;
 			y = +this.new_tile_data[i].y;
 //			var new_tile = +this.new_tile_data[i].tile;
-			var new_tile = this.new_tile_data[i].old_tile;
+			var new_tile = this.map.getTile( x, y, l );
 			new_tile.index = +this.new_tile_data[i].tile;
 			if( this.new_tile_data[i].solid )
 			{
 				new_tile.collides = true;
-				new_tile.faceTop = true;
-				new_tile.faceBottom = true;
-				new_tile.faceLeft = true;
-				new_tile.faceRight = true;
+//				new_tile.faceTop = true;
+//				new_tile.faceBottom = true;
+//				new_tile.faceLeft = true;
+//				new_tile.faceRight = true;
+//				new_tile.collideTop = true;
+//				new_tile.collideBottom = true;
+//				new_tile.collideLeft = true;
+//				new_tile.collideRight = true;
 			}
 			else
 			{
 				new_tile.collides = false;
-				new_tile.faceTop = false;
-				new_tile.faceBottom = false;
-				new_tile.faceLeft = false;
-				new_tile.faceRight = false;
+//				new_tile.faceTop = false;
+//				new_tile.faceBottom = false;
+//				new_tile.faceLeft = false;
+//				new_tile.faceRight = false;
+//				new_tile.collideTop = false;
+//				new_tile.collideBottom = false;
+//				new_tile.collideLeft = false;
+//				new_tile.collideRight = false;
 			}
 			this.map.putTile( new_tile, x, y, l );
 		}
@@ -1672,7 +1688,7 @@ Nadion.StateMachine.prototype.reset = function()
 			var l = Nadion.findNamedItemInArray( this.game_state.layers, this.new_tile_data[i].layer );
 			var x = +this.new_tile_data[i].x;
 			var y = +this.new_tile_data[i].y;
-			var old_tile = +this.new_tile_data[i].old_tile;
+			var old_tile = this.new_tile_data[i].old_tile;
 			this.map.putTile( old_tile, x, y, l );
 		}
 		// reset the trigger tile, if we changed it

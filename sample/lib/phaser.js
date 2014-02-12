@@ -18,7 +18,7 @@
 *
 * Phaser - http://www.phaser.io
 *
-* v1.1.4 - Built at: Thu Feb 06 2014 14:25:37
+* v1.1.5 - Built at: Wed Feb 12 2014 09:47:56
 *
 * By Richard Davey http://www.photonstorm.com @photonstorm
 *
@@ -57,8 +57,8 @@ var PIXI = PIXI || {};
 */
 var Phaser = Phaser || {
 
-	VERSION: '1.1.4',
-	DEV_VERSION: '1.1.4',
+	VERSION: '1.1.5',
+	DEV_VERSION: '1.1.5',
 	GAMES: [],
 
 	AUTO: 0,
@@ -139,9 +139,9 @@ Phaser.Utils = {
     * dir = 1 (left), 2 (right), 3 (both)
     * @method Phaser.Utils.pad
     * @param {string} str - The target string. 
-    * @param {number} len - Description.
-    * @param {number} pad - the string to pad it out with (defaults to a space).
-    * @param {number} [dir=3] the direction dir = 1 (left), 2 (right), 3 (both).
+    * @param {number} len - The number of characters to be added.
+    * @param {number} pad - The string to pad it out with (defaults to a space).
+    * @param {number} [dir=3] The direction dir = 1 (left), 2 (right), 3 (both).
     * @return {string} The padded string
     */
     pad: function (str, len, pad, dir) {
@@ -29069,6 +29069,271 @@ Phaser.Polygon.prototype.constructor = Phaser.Polygon;
 */
 
 /**
+* Creates a new Line object with a start and an end point.
+* @class Line
+* @classdesc Phaser - Line
+* @constructor
+* @param {number} [x1=0] - The x coordinate of the start of the line.
+* @param {number} [y1=0] - The y coordinate of the start of the line.
+* @param {number} [x2=0] - The x coordinate of the end of the line.
+* @param {number} [y2=0] - The y coordinate of the end of the line.
+* @return {Phaser.Line} This line object
+*/
+Phaser.Line = function (x1, y1, x2, y2) {
+
+    x1 = x1 || 0;
+    y1 = y1 || 0;
+    x2 = x2 || 0;
+    y2 = y2 || 0;
+
+    /**
+    * @property {Phaser.Point} start - The start point of the line.
+    */
+    this.start = new Phaser.Point(x1, y1);
+
+    /**
+    * @property {Phaser.Point} end - The end point of the line.
+    */
+    this.end = new Phaser.Point(x2, y2);
+
+};
+
+Phaser.Line.prototype = {
+
+    /**
+    * Sets the components of the Line to the specified values.
+    * @method Phaser.Line#setTo
+    * @param {number} [x1=0] - The x coordinate of the start of the line.
+    * @param {number} [y1=0] - The y coordinate of the start of the line.
+    * @param {number} [x2=0] - The x coordinate of the end of the line.
+    * @param {number} [y2=0] - The y coordinate of the end of the line.
+    * @return {Phaser.Line} This line object
+    */
+    setTo: function (x1, y1, x2, y2) {
+
+        this.start.setTo(x1, y1);
+        this.end.setTo(x2, y2);
+
+        return this;
+
+    },
+
+    /**
+    * Sets the line to match the x/y coordinates of the two given sprites.
+    * Can optionally be calculated from their center coordinates.
+    * @method Phaser.Line#fromSprite
+    * @param {Phaser.Sprite} startSprite - The coordinates of this Sprite will be set to the Line.start point.
+    * @param {Phaser.Sprite} endSprite - The coordinates of this Sprite will be set to the Line.start point.
+    * @param {boolean} [useCenter=true] - If true it will use startSprite.center.x, if false startSprite.x.
+    * @return {Phaser.Line} This line object
+    */
+    fromSprite: function (startSprite, endSprite, useCenter) {
+
+        if (typeof useCenter === 'undefined') { useCenter = true; }
+
+        if (useCenter)
+        {
+            return this.setTo(startSprite.center.x, startSprite.center.y, endSprite.center.x, endSprite.center.y);
+        }
+        else
+        {
+            return this.setTo(startSprite.x, startSprite.y, endSprite.x, endSprite.y);
+        }
+
+    },
+
+    /**
+    * Checks for intersection between this line and another Line.
+    * If asSegment is true it will check for segment intersection. If asSegment is false it will check for line intersection.
+    * Returns the intersection segment of AB and EF as a Point, or null if there is no intersection.
+    *
+    * @method Phaser.Line#intersects
+    * @param {Phaser.Line} line - The line to check against this one.
+    * @param {boolean} [asSegment=true] - If true it will check for segment intersection, otherwise full line intersection.
+    * @param {Phaser.Point} [result] - A Point object to store the result in, if not given a new one will be created.
+    * @return {Phaser.Point} The intersection segment of the two lines as a Point, or null if there is no intersection.
+    */
+    intersects: function (line, asSegment, result) {
+
+        return Phaser.Line.intersectsPoints(this.start, this.end, line.start, line.end, asSegment, result);
+
+    },
+
+    /**
+    * Tests if the given coordinates fall on this line. See pointOnSegment to test against just the line segment.
+    * @method Phaser.Line#pointOnLine
+    * @param {number} x - The line to check against this one.
+    * @param {number} y - The line to check against this one.
+    * @return {boolean} True if the point is on the line, false if not.
+    */
+    pointOnLine: function (x, y) {
+
+        return ((x - this.start.x) * (this.end.y - this.end.y) === (this.end.x - this.start.x) * (y - this.end.y));
+
+    },
+
+    /**
+    * Tests if the given coordinates fall on this line and within the segment. See pointOnLine to test against just the line.
+    * @method Phaser.Line#pointOnSegment
+    * @param {number} x - The line to check against this one.
+    * @param {number} y - The line to check against this one.
+    * @return {boolean} True if the point is on the line and segment, false if not.
+    */
+    pointOnSegment: function (x, y) {
+
+        var xMin = Math.min(this.start.x, this.end.x);
+        var xMax = Math.max(this.start.x, this.end.x);
+        var yMin = Math.min(this.start.y, this.end.y);
+        var yMax = Math.max(this.start.y, this.end.y);
+
+        return (this.pointOnLine(x, y) && (x >= xMin && x <= xMax) && (y >= yMin && y <= yMax));
+
+    }
+
+};
+
+/**
+* @name Phaser.Line#length
+* @property {number} length - Gets the length of the line segment.
+* @readonly
+*/
+Object.defineProperty(Phaser.Line.prototype, "length", {
+
+    get: function () {
+        return Math.sqrt((this.end.x - this.start.x) * (this.end.x - this.start.x) + (this.end.y - this.start.y) * (this.end.y - this.start.y));
+    }
+
+});
+
+/**
+* @name Phaser.Line#angle
+* @property {number} angle - Gets the angle of the line.
+* @readonly
+*/
+Object.defineProperty(Phaser.Line.prototype, "angle", {
+
+    get: function () {
+        return Math.atan2(this.end.x - this.start.x, this.end.y - this.start.y);
+    }
+
+});
+
+/**
+* @name Phaser.Line#slope
+* @property {number} slope - Gets the slope of the line (y/x).
+* @readonly
+*/
+Object.defineProperty(Phaser.Line.prototype, "slope", {
+
+    get: function () {
+        return (this.end.y - this.start.y) / (this.end.x - this.start.x);
+    }
+
+});
+
+/**
+* @name Phaser.Line#perpSlope
+* @property {number} perpSlope - Gets the perpendicular slope of the line (x/y).
+* @readonly
+*/
+Object.defineProperty(Phaser.Line.prototype, "perpSlope", {
+
+    get: function () {
+        return -((this.end.x - this.start.x) / (this.end.y - this.start.y));
+    }
+
+});
+
+/**
+* Checks for intersection between two lines as defined by the given start and end points.
+* If asSegment is true it will check for line segment intersection. If asSegment is false it will check for line intersection.
+* Returns the intersection segment of AB and EF as a Point, or null if there is no intersection.
+* Adapted from code by Keith Hair
+*
+* @method Phaser.Line.intersects
+* @param {Phaser.Point} a - The start of the first Line to be checked.
+* @param {Phaser.Point} b - The end of the first line to be checked.
+* @param {Phaser.Point} e - The start of the second Line to be checked.
+* @param {Phaser.Point} f - The end of the second line to be checked.
+* @param {boolean} [asSegment=true] - If true it will check for segment intersection, otherwise full line intersection.
+* @param {Phaser.Point} [result] - A Point object to store the result in, if not given a new one will be created.
+* @return {Phaser.Point} The intersection segment of the two lines as a Point, or null if there is no intersection.
+*/
+Phaser.Line.intersectsPoints = function (a, b, e, f, asSegment, result) {
+
+    if (typeof asSegment === 'undefined') { asSegment = true; }
+    if (typeof result === 'undefined') { result = new Phaser.Point(); }
+
+    var a1 = b.y - a.y;
+    var a2 = f.y - e.y;
+    var b1 = a.x - b.x;
+    var b2 = e.x - f.x;
+    var c1 = (b.x * a.y) - (a.x * b.y);
+    var c2 = (f.x * e.y) - (e.x * f.y);
+    var denom = (a1 * b2) - (a2 * b1);
+
+    if (denom === 0)
+    {
+        return null;
+    }
+
+    result.x = ((b1 * c2) - (b2 * c1)) / denom;
+    result.y = ((a2 * c1) - (a1 * c2)) / denom;
+ 
+    if (asSegment)
+    {
+        if (Math.pow((result.x - b.x) + (result.y - b.y), 2) > Math.pow((a.x - b.x) + (a.y - b.y), 2))
+        {
+            return null;
+        }
+
+        if (Math.pow((result.x - a.x) + (result.y - a.y), 2) > Math.pow((a.x - b.x) + (a.y - b.y), 2))
+        {
+            return null;
+        }
+
+        if (Math.pow((result.x - f.x) + (result.y - f.y), 2) > Math.pow((e.x - f.x) + (e.y - f.y), 2))
+        {
+            return null;
+        }
+
+        if (Math.pow((result.x - e.x) + (result.y - e.y), 2) > Math.pow((e.x - f.x) + (e.y - f.y), 2))
+        {
+            return null;
+        }
+    }
+
+    return result;
+
+};
+
+/**
+* Checks for intersection between two lines.
+* If asSegment is true it will check for segment intersection.
+* If asSegment is false it will check for line intersection.
+* Returns the intersection segment of AB and EF as a Point, or null if there is no intersection.
+* Adapted from code by Keith Hair
+*
+* @method Phaser.Line.intersects
+* @param {Phaser.Line} a - The first Line to be checked.
+* @param {Phaser.Line} b - The second Line to be checked.
+* @param {boolean} [asSegment=true] - If true it will check for segment intersection, otherwise full line intersection.
+* @param {Phaser.Point} [result] - A Point object to store the result in, if not given a new one will be created.
+* @return {Phaser.Point} The intersection segment of the two lines as a Point, or null if there is no intersection.
+*/
+Phaser.Line.intersects = function (a, b, asSegment, result) {
+
+    return Phaser.Line.intersectsPoints(a.start, a.end, b.start, b.end, asSegment, result);
+
+};
+
+/**
+* @author       Richard Davey <rich@photonstorm.com>
+* @copyright    2014 Photon Storm Ltd.
+* @license      {@link https://github.com/photonstorm/phaser/blob/master/license.txt|MIT License}
+*/
+
+/**
 * Phaser.Net handles browser URL related tasks such as checking host names, domain names and query string manipulation.
 *
 * @class Phaser.Net
@@ -31173,7 +31438,7 @@ Phaser.Timer.prototype = {
         {
             if (this.events[i] === event)
             {
-                this.events.splice(i, 1);
+                this.events[i].pendingDelete = true;
                 return true;
             }
         }
@@ -31233,6 +31498,21 @@ Phaser.Timer.prototype = {
         }
 
         this._now = time - this._started;
+
+        this._len = this.events.length;
+
+        this._i = 0;
+
+        while (this._i < this._len)
+        {
+            if (this.events[this._i].pendingDelete)
+            {
+                this.events.splice(this._i, 1);
+                this._len--;
+            }
+
+            this._i++;
+        }
 
         this._len = this.events.length;
 
@@ -31299,9 +31579,12 @@ Phaser.Timer.prototype = {
     */
     pause: function () {
         
-        this._pauseStarted = this.game.time.now;
+        if (this.running && !this.expired)
+        {
+            this._pauseStarted = this.game.time.now;
 
-        this.paused = true;
+            this.paused = true;
+        }
 
     },
 
@@ -31311,16 +31594,19 @@ Phaser.Timer.prototype = {
     */
     resume: function () {
 
-        var pauseDuration = this.game.time.now - this._pauseStarted;
-
-        for (var i = 0; i < this.events.length; i++)
+        if (this.running && !this.expired)
         {
-            this.events[i].tick += pauseDuration;
+            var pauseDuration = this.game.time.now - this._pauseStarted;
+
+            for (var i = 0; i < this.events.length; i++)
+            {
+                this.events[i].tick += pauseDuration;
+            }
+
+            this.nextTick += pauseDuration;
+
+            this.paused = false;
         }
-
-        this.nextTick += pauseDuration;
-
-        this.paused = false;
 
     },
 
@@ -31333,6 +31619,7 @@ Phaser.Timer.prototype = {
         this.onComplete.removeAll();
         this.running = false;
         this.events = [];
+        this._i = this._len;
 
     }
 
@@ -31477,6 +31764,12 @@ Phaser.TimerEvent = function (timer, delay, tick, repeatCount, loop, callback, c
     * @property {array} arguments - The values to be passed to the callback.
     */
 	this.args = args;
+
+    /**
+    * @property {boolean} pendingDelete - A flag that controls if the TimerEvent is pending deletion.
+    * @protected
+    */
+    this.pendingDelete = false;
 
 };
 
@@ -37955,33 +38248,7 @@ Phaser.Color = {
 // polygons using the Separating Axis Theorem.
 /** @preserve SAT.js - Version 0.2 - Copyright 2013 - Jim Riecken <jimr@jimr.ca> - released under the MIT License. https://github.com/jriecken/sat-js */
 
-/*global define: false, module: false*/
-/*jshint shadow:true, sub:true, forin:true, noarg:true, noempty:true, 
-  eqeqeq:true, bitwise:true, strict:true, undef:true, 
-  curly:true, browser:true */
-
-// Create a UMD wrapper for SAT. Works in:
-//
-//  - Plain browser via global SAT variable
-//  - AMD loader (like require.js)
-//  - Node.js
-//
-// The quoted properties all over the place are used so that the Closure Compiler
-// does not mangle the exposed API in advanced mode.
-/**
- * @param {*} root - The global scope
- * @param {Function} factory - Factory that creates SAT module
- */
-(function (root, factory) {
-  "use strict";
-  if (typeof define === 'function' && define['amd']) {
-    define(factory);
-  } else if (typeof exports === 'object') {
-    module['exports'] = factory();
-  } else {
-    root['SAT'] = factory();
-  }
-}(this, function () {
+var SAT = (function () {
   "use strict";
 
   var SAT = {};
@@ -37994,7 +38261,7 @@ Phaser.Color = {
 
   // Create a new Vector, optionally passing in the `x` and `y` coordinates. If
   // a coordinate is not specified, it will be set to `0`
-  /** 
+  /**
    * @param {?number=} x The x position.
    * @param {?number=} y The y position.
    * @constructor
@@ -38067,7 +38334,7 @@ Phaser.Color = {
     this['y'] = -this['y'];
     return this;
   };
-  
+
 
   // Normalize this vector.  (make it have length of `1`)
   /**
@@ -38081,7 +38348,7 @@ Phaser.Color = {
     }
     return this;
   };
-  
+
   // Add another vector to this one.
   /**
    * @param {Vector} other The other Vector.
@@ -38092,7 +38359,7 @@ Phaser.Color = {
     this['y'] += other['y'];
     return this;
   };
-  
+
   // Subtract another vector from this one.
   /**
    * @param {Vector} other The other Vector.
@@ -38103,7 +38370,7 @@ Phaser.Color = {
     this['y'] -= other['y'];
     return this;
   };
-  
+
   // Scale this vector. An independant scaling factor can be provided
   // for each axis, or a single scaling factor that will scale both `x` and `y`.
   /**
@@ -38115,9 +38382,9 @@ Phaser.Color = {
   Vector.prototype['scale'] = Vector.prototype.scale = function(x,y) {
     this['x'] *= x;
     this['y'] *= y || x;
-    return this; 
+    return this;
   };
-  
+
   // Project this vector on to another vector.
   /**
    * @param {Vector} other The vector to project onto.
@@ -38129,7 +38396,7 @@ Phaser.Color = {
     this['y'] = amt * other['y'];
     return this;
   };
-  
+
   // Project this vector onto a vector of unit length. This is slightly more efficient
   // than `project` when dealing with unit vectors.
   /**
@@ -38142,7 +38409,7 @@ Phaser.Color = {
     this['y'] = amt * other['y'];
     return this;
   };
-  
+
   // Reflect this vector on an arbitrary axis.
   /**
    * @param {Vector} axis The vector representing the axis.
@@ -38156,7 +38423,7 @@ Phaser.Color = {
     this['y'] -= y;
     return this;
   };
-  
+
   // Reflect this vector on an arbitrary axis (represented by a unit vector). This is
   // slightly more efficient than `reflect` when dealing with an axis that is a unit vector.
   /**
@@ -38171,7 +38438,7 @@ Phaser.Color = {
     this['y'] -= y;
     return this;
   };
-  
+
   // Get the dot product of this vector and another.
   /**
    * @param {Vector}  other The vector to dot this one against.
@@ -38180,7 +38447,7 @@ Phaser.Color = {
   Vector.prototype['dot'] = Vector.prototype.dot = function(other) {
     return this['x'] * other['x'] + this['y'] * other['y'];
   };
-  
+
   // Get the squared length of this vector.
   /**
    * @return {number} The length^2 of this vector.
@@ -38188,7 +38455,7 @@ Phaser.Color = {
   Vector.prototype['len2'] = Vector.prototype.len2 = function() {
     return this.dot(this);
   };
-  
+
   // Get the length of this vector.
   /**
    * @return {number} The length of this vector.
@@ -38196,7 +38463,7 @@ Phaser.Color = {
   Vector.prototype['len'] = Vector.prototype.len = function() {
     return Math.sqrt(this.len2());
   };
-  
+
   // ## Circle
   //
   // Represents a circle with a position and a radius.
@@ -38239,7 +38506,7 @@ Phaser.Color = {
     this.recalc();
   }
   SAT['Polygon'] = Polygon;
-  
+
   // Recalculates the edges and normals of the polygon. This **must** be called
   // if the `points` array is modified at all and the edges or normals are to be
   // accessed.
@@ -38258,7 +38525,7 @@ Phaser.Color = {
     var points = this['points'];
     var len = points.length;
     for (var i = 0; i < len; i++) {
-      var p1 = points[i]; 
+      var p1 = points[i];
       var p2 = i < len - 1 ? points[i + 1] : points[0];
       var e = new Vector().copy(p2).sub(p1);
       var n = new Vector().copy(e).perp().normalize();
@@ -38367,11 +38634,11 @@ Phaser.Color = {
     var w = this['w'];
     var h = this['h'];
     return new Polygon(new Vector(pos['x'], pos['y']), [
-     new Vector(), new Vector(w, 0), 
+     new Vector(), new Vector(w, 0),
      new Vector(w,h), new Vector(0,h)
     ]);
   };
-  
+
   // ## Response
   //
   // An object representing the result of an intersection. Contains:
@@ -38382,7 +38649,7 @@ Phaser.Color = {
   //  - Whether the first object is entirely inside the second, and vice versa.
   /**
    * @constructor
-   */  
+   */
   function Response() {
     this['a'] = null;
     this['b'] = null;
@@ -38414,7 +38681,7 @@ Phaser.Color = {
    */
   var T_VECTORS = [];
   for (var i = 0; i < 10; i++) { T_VECTORS.push(new Vector()); }
-  
+
   // A pool of arrays of numbers used in calculations to avoid allocating
   // memory.
   /**
@@ -38447,7 +38714,7 @@ Phaser.Color = {
     }
     result[0] = min; result[1] = max;
   }
-  
+
   // Check whether two convex polygons are separated by the specified
   // axis (must be a unit vector).
   /**
@@ -38477,8 +38744,8 @@ Phaser.Color = {
     rangeB[1] += projectedOffset;
     // Check if there is a gap. If there is, this is a separating axis and we can stop
     if (rangeA[0] > rangeB[1] || rangeB[0] > rangeA[1]) {
-      T_VECTORS.push(offsetV); 
-      T_ARRAYS.push(rangeA); 
+      T_VECTORS.push(offsetV);
+      T_ARRAYS.push(rangeA);
       T_ARRAYS.push(rangeB);
       return true;
     }
@@ -38489,7 +38756,7 @@ Phaser.Color = {
       if (rangeA[0] < rangeB[0]) {
         response['aInB'] = false;
         // A ends before B does. We have to pull A out of B
-        if (rangeA[1] < rangeB[1]) { 
+        if (rangeA[1] < rangeB[1]) {
           overlap = rangeA[1] - rangeB[0];
           response['bInA'] = false;
         // B is fully inside A.  Pick the shortest way out.
@@ -38502,7 +38769,7 @@ Phaser.Color = {
       } else {
         response['bInA'] = false;
         // B ends before A ends. We have to push A out of B
-        if (rangeA[1] > rangeB[1]) { 
+        if (rangeA[1] > rangeB[1]) {
           overlap = rangeA[0] - rangeB[1];
           response['aInB'] = false;
         // A is fully inside B.  Pick the shortest way out.
@@ -38520,14 +38787,14 @@ Phaser.Color = {
         if (overlap < 0) {
           response['overlapN'].reverse();
         }
-      }      
+      }
     }
-    T_VECTORS.push(offsetV); 
-    T_ARRAYS.push(rangeA); 
+    T_VECTORS.push(offsetV);
+    T_ARRAYS.push(rangeA);
     T_ARRAYS.push(rangeB);
     return false;
   }
-  
+
   // Calculates which Vornoi region a point is on a line segment.
   // It is assumed that both the line and the point are relative to `(0,0)`
   //
@@ -38537,8 +38804,8 @@ Phaser.Color = {
   /**
    * @param {Vector} line The line segment.
    * @param {Vector} point The point.
-   * @return  {number} LEFT_VORNOI_REGION (-1) if it is the left region, 
-   *          MIDDLE_VORNOI_REGION (0) if it is the middle region, 
+   * @return  {number} LEFT_VORNOI_REGION (-1) if it is the left region,
+   *          MIDDLE_VORNOI_REGION (0) if it is the middle region,
    *          RIGHT_VORNOI_REGION (1) if it is the right region.
    */
   function vornoiRegion(line, point) {
@@ -38566,7 +38833,7 @@ Phaser.Color = {
    * @const
    */
   var RIGHT_VORNOI_REGION = 1;
-  
+
   // ## Collision Tests
 
   // Check if two circles collide.
@@ -38575,7 +38842,7 @@ Phaser.Color = {
    * @param {Circle} b The second circle.
    * @param {Response=} response Response object (optional) that will be populated if
    *   the circles intersect.
-   * @return {boolean} true if the circles intersect, false if they don't. 
+   * @return {boolean} true if the circles intersect, false if they don't.
    */
   function testCircleCircle(a, b, response) {
     // Check if the distance between the centers of the two
@@ -38590,7 +38857,7 @@ Phaser.Color = {
       return false;
     }
     // They intersect.  If we're calculating a response, calculate the overlap.
-    if (response) { 
+    if (response) {
       var dist = Math.sqrt(distanceSq);
       response['a'] = a;
       response['b'] = b;
@@ -38604,7 +38871,7 @@ Phaser.Color = {
     return true;
   }
   SAT['testCircleCircle'] = testCircleCircle;
-  
+
   // Check if a polygon and a circle collide.
   /**
    * @param {Polygon} polygon The polygon.
@@ -38622,30 +38889,30 @@ Phaser.Color = {
     var len = points.length;
     var edge = T_VECTORS.pop();
     var point = T_VECTORS.pop();
-    
+
     // For each edge in the polygon:
     for (var i = 0; i < len; i++) {
       var next = i === len - 1 ? 0 : i + 1;
       var prev = i === 0 ? len - 1 : i - 1;
       var overlap = 0;
       var overlapN = null;
-      
+
       // Get the edge.
       edge.copy(polygon['edges'][i]);
       // Calculate the center of the circle relative to the starting point of the edge.
       point.copy(circlePos).sub(points[i]);
-      
+
       // If the distance between the center of the circle and the point
       // is bigger than the radius, the polygon is definitely not fully in
       // the circle.
       if (response && point.len2() > radius2) {
         response['aInB'] = false;
       }
-      
+
       // Calculate which Vornoi region the center of the circle is in.
       var region = vornoiRegion(edge, point);
       // If it's the left region:
-      if (region === LEFT_VORNOI_REGION) { 
+      if (region === LEFT_VORNOI_REGION) {
         // We need to make sure we're in the RIGHT_VORNOI_REGION of the previous edge.
         edge.copy(polygon['edges'][prev]);
         // Calculate the center of the circle relative the starting point of the previous edge
@@ -38656,9 +38923,9 @@ Phaser.Color = {
           var dist = point.len();
           if (dist > radius) {
             // No intersection
-            T_VECTORS.push(circlePos); 
+            T_VECTORS.push(circlePos);
             T_VECTORS.push(edge);
-            T_VECTORS.push(point); 
+            T_VECTORS.push(point);
             T_VECTORS.push(point2);
             return false;
           } else if (response) {
@@ -38681,10 +38948,10 @@ Phaser.Color = {
           var dist = point.len();
           if (dist > radius) {
             // No intersection
-            T_VECTORS.push(circlePos); 
-            T_VECTORS.push(edge); 
+            T_VECTORS.push(circlePos);
+            T_VECTORS.push(edge);
             T_VECTORS.push(point);
-            return false;              
+            return false;
           } else if (response) {
             // It intersects, calculate the overlap.
             response['bInA'] = false;
@@ -38697,15 +38964,15 @@ Phaser.Color = {
         // Need to check if the circle is intersecting the edge,
         // Change the edge into its "edge normal".
         var normal = edge.perp().normalize();
-        // Find the perpendicular distance between the center of the 
+        // Find the perpendicular distance between the center of the
         // circle and the edge.
         var dist = point.dot(normal);
         var distAbs = Math.abs(dist);
         // If the circle is on the outside of the edge, there is no intersection.
         if (dist > 0 && distAbs > radius) {
           // No intersection
-          T_VECTORS.push(circlePos); 
-          T_VECTORS.push(normal); 
+          T_VECTORS.push(circlePos);
+          T_VECTORS.push(normal);
           T_VECTORS.push(point);
           return false;
         } else if (response) {
@@ -38719,28 +38986,28 @@ Phaser.Color = {
           }
         }
       }
-      
-      // If this is the smallest overlap we've seen, keep it. 
+
+      // If this is the smallest overlap we've seen, keep it.
       // (overlapN may be null if the circle was in the wrong Vornoi region).
       if (overlapN && response && Math.abs(overlap) < Math.abs(response['overlap'])) {
         response['overlap'] = overlap;
         response['overlapN'].copy(overlapN);
       }
     }
-    
+
     // Calculate the final overlap vector - based on the smallest overlap.
     if (response) {
       response['a'] = polygon;
       response['b'] = circle;
       response['overlapV'].copy(response['overlapN']).scale(response['overlap']);
     }
-    T_VECTORS.push(circlePos); 
-    T_VECTORS.push(edge); 
+    T_VECTORS.push(circlePos);
+    T_VECTORS.push(edge);
     T_VECTORS.push(point);
     return true;
   }
   SAT['testPolygonCircle'] = testPolygonCircle;
-  
+
   // Check if a circle and a polygon collide.
   //
   // **NOTE:** This is slightly less efficient than polygonCircle as it just
@@ -38769,7 +39036,7 @@ Phaser.Color = {
     return result;
   }
   SAT['testCirclePolygon'] = testCirclePolygon;
-  
+
   // Checks whether polygons collide.
   /**
    * @param {Polygon} a The first polygon.
@@ -38808,7 +39075,8 @@ Phaser.Color = {
   SAT['testPolygonPolygon'] = testPolygonPolygon;
 
   return SAT;
-}));
+})();
+
 /**
 * @author       Richard Davey <rich@photonstorm.com>
 * @copyright    2014 Photon Storm Ltd.
@@ -41130,10 +41398,10 @@ Phaser.Physics.Arcade.Body.prototype = {
     */
     separate: function (body, response) {
 
-        if (this.inContact(body))
-        {
-            return false;
-        }
+        // if (this.inContact(body))
+        // {
+            // return false;
+        // }
 
         this._distances[0] = body.right - this.x;   // Distance of B to face on left side of A
         this._distances[1] = this.right - body.x;   // Distance of B to face on right side of A
@@ -41192,10 +41460,10 @@ Phaser.Physics.Arcade.Body.prototype = {
         else
         {
             //  They can only contact like this if at least one of their sides is open, otherwise it's a separation
-            // if (!this.checkCollision.up || !this.checkCollision.down || !this.checkCollision.left || !this.checkCollision.right || !body.checkCollision.up || !body.checkCollision.down || !body.checkCollision.left || !body.checkCollision.right)
-            // {
+            if (!this.checkCollision.up || !this.checkCollision.down || !this.checkCollision.left || !this.checkCollision.right || !body.checkCollision.up || !body.checkCollision.down || !body.checkCollision.left || !body.checkCollision.right)
+            {
                 this.addContact(body);
-            // }
+            }
         }
 
         return hasSeparated;
@@ -41223,7 +41491,7 @@ Phaser.Physics.Arcade.Body.prototype = {
 
         if (this.collideCallback && !this.collideCallback.call(this.collideCallbackContext, Phaser.LEFT, this, body, response))
         {
-            return;
+            return false;
         }
 
         if (!this.moves || this.immovable || this.blocked.right || this.touching.right)
@@ -41246,6 +41514,8 @@ Phaser.Physics.Arcade.Body.prototype = {
 
         this.touching.left = true;
         body.touching.right = true;
+
+        return true;
 
     },
 
@@ -41270,7 +41540,7 @@ Phaser.Physics.Arcade.Body.prototype = {
 
         if (this.collideCallback && !this.collideCallback.call(this.collideCallbackContext, Phaser.RIGHT, this, body))
         {
-            return;
+            return false;
         }
 
         if (!this.moves || this.immovable || this.blocked.left || this.touching.left)
@@ -41293,6 +41563,8 @@ Phaser.Physics.Arcade.Body.prototype = {
 
         this.touching.right = true;
         body.touching.left = true;
+
+        return true;
 
     },
 
@@ -42825,14 +43097,49 @@ Phaser.Tilemap = function (game, key) {
         return;
     }
 
+    /**
+    * @property {number} width - The width of the map (in tiles).
+    */
     this.width = data.width;
+
+    /**
+    * @property {number} height - The height of the map (in tiles).
+    */
     this.height = data.height;
+
+    /**
+    * @property {number} tileWidth - The base width of the tiles in the map (in pixels).
+    */
     this.tileWidth = data.tileWidth;
+
+    /**
+    * @property {number} tileHeight - The base height of the tiles in the map (in pixels).
+    */
     this.tileHeight = data.tileHeight;
+
+    /**
+    * @property {string} orientation - The orientation of the map data (as specified in Tiled), usually 'orthogonal'.
+    */
     this.orientation = data.orientation;
+
+    /**
+    * @property {number} version - The version of the map data (as specified in Tiled, usually 1).
+    */
     this.version = data.version;
+
+    /**
+    * @property {object} properties - Map specific properties as specified in Tiled.
+    */
     this.properties = data.properties;
+
+    /**
+    * @property {number} widthInPixels - The width of the map in pixels based on width * tileWidth.
+    */
     this.widthInPixels = data.widthInPixels;
+
+    /**
+    * @property {number} heightInPixels - The height of the map in pixels based on height * tileHeight.
+    */
     this.heightInPixels = data.heightInPixels;
 
     /**
@@ -42877,13 +43184,13 @@ Phaser.Tilemap = function (game, key) {
     this._results = [];
 
     /**
-    * @property {number} _tempA - Internal var.
+    * @property {number} _tempA - Internal cache var.
     * @private
     */
     this._tempA = 0;
 
     /**
-    * @property {number} _tempB - Internal var.
+    * @property {number} _tempB - Internal cache var.
     * @private
     */
     this._tempB = 0;
@@ -42938,7 +43245,7 @@ Phaser.Tilemap.prototype = {
             format: Phaser.Tilemap.CSV,
             data: data,
             indexes: [],
-			dirty: true
+            dirty: true
 
         });
 
@@ -42984,12 +43291,13 @@ Phaser.Tilemap.prototype = {
 
     },
 
-    //  Region? Remove tile from map data?
+    /*
     createFromTiles: function (layer, tileIndex, key, frame, group) {
 
         if (typeof group === 'undefined') { group = this.game.world; }
 
     },
+    */
 
     /**
     * Creates a Sprite for every object matching the given gid in the map data. You can optionally specify the group that the Sprite will be created in. If none is
@@ -42997,7 +43305,7 @@ Phaser.Tilemap.prototype = {
     * configure Sprite properties from within the map editor. For example giving an object a property if alpha: 0.5 in the map editor will duplicate that when the
     * Sprite is created. You could also give it a value like: body.velocity.x: 100 to set it moving automatically.
     *
-    * @method Phaser.Tileset#createFromObjects
+    * @method Phaser.Tilemap#createFromObjects
     * @param {string} name - The name of the Object Group to create Sprites from.
     * @param {number} gid - The layer array index value, or if a string is given the layer name, within the map data that this TilemapLayer represents.
     * @param {string} key - The Game.cache key of the image that this Sprite will use.
@@ -43042,8 +43350,10 @@ Phaser.Tilemap.prototype = {
 
     /**
     * Creates a new TilemapLayer object. By default TilemapLayers are fixed to the camera.
+    * The `layer` parameter is important. If you've created your map in Tiled then you can get this by looking in Tiled and looking at the Layer name.
+    * Or you can open the JSON file it exports and look at the layers[].name value. Either way it must match.
     *
-    * @method Phaser.Tileset#createLayer
+    * @method Phaser.Tilemap#createLayer
     * @param {number|string} layer - The layer array index value, or if a string is given the layer name, within the map data that this TilemapLayer represents.
     * @param {number} [width] - The rendered width of the layer, should never be wider than Game.width. If not given it will be set to Game.width.
     * @param {number} [height] - The rendered height of the layer, should never be wider than Game.height. If not given it will be set to Game.height.
@@ -43078,7 +43388,7 @@ Phaser.Tilemap.prototype = {
     /**
     * Gets the layer index based on the layers name.
     *
-    * @method Phaser.Tileset#getIndex
+    * @method Phaser.Tilemap#getIndex
     * @protected
     * @param {array} location - The local array to search.
     * @param {string} name - The name of the array element to get.
@@ -43101,7 +43411,7 @@ Phaser.Tilemap.prototype = {
     /**
     * Gets the layer index based on its name.
     *
-    * @method Phaser.Tileset#getLayerIndex
+    * @method Phaser.Tilemap#getLayerIndex
     * @param {string} name - The name of the layer to get.
     * @return {number} The index of the layer in this tilemap, or null if not found.
     */
@@ -43114,7 +43424,7 @@ Phaser.Tilemap.prototype = {
     /**
     * Gets the tileset index based on its name.
     *
-    * @method Phaser.Tileset#getTilesetIndex
+    * @method Phaser.Tilemap#getTilesetIndex
     * @param {string} name - The name of the tileset to get.
     * @return {number} The index of the tileset in this tilemap, or null if not found.
     */
@@ -43127,7 +43437,7 @@ Phaser.Tilemap.prototype = {
     /**
     * Gets the image index based on its name.
     *
-    * @method Phaser.Tileset#getImageIndex
+    * @method Phaser.Tilemap#getImageIndex
     * @param {string} name - The name of the image to get.
     * @return {number} The index of the image in this tilemap, or null if not found.
     */
@@ -43140,7 +43450,7 @@ Phaser.Tilemap.prototype = {
     /**
     * Gets the object index based on its name.
     *
-    * @method Phaser.Tileset#getObjectIndex
+    * @method Phaser.Tilemap#getObjectIndex
     * @param {string} name - The name of the object to get.
     * @return {number} The index of the object in this tilemap, or null if not found.
     */
@@ -43155,7 +43465,7 @@ Phaser.Tilemap.prototype = {
     * If a callback is already set for the tile index it will be replaced. Set the callback to null to remove it.
     * If you want to set a callback for a tile at a specific location on the map then see setTileLocationCallback.
     *
-    * @method Phaser.Tileset#setTileIndexCallback
+    * @method Phaser.Tilemap#setTileIndexCallback
     * @param {number|array} indexes - Either a single tile index, or an array of tile indexes to have a collision callback set for.
     * @param {function} callback - The callback that will be invoked when the tile is collided with.
     * @param {object} callbackContext - The context under which the callback is called.
@@ -43186,7 +43496,7 @@ Phaser.Tilemap.prototype = {
     * If a callback is already set for the tile index it will be replaced. Set the callback to null to remove it.
     * If you want to set a callback for a tile at a specific location on the map then see setTileLocationCallback.
     *
-    * @method Phaser.Tileset#setTileLocationCallback
+    * @method Phaser.Tilemap#setTileLocationCallback
     * @param {number} x - X position of the top left of the area to copy (given in tiles, not pixels)
     * @param {number} y - Y position of the top left of the area to copy (given in tiles, not pixels)
     * @param {number} width - The width of the area to copy (given in tiles, not pixels)
@@ -43217,7 +43527,7 @@ Phaser.Tilemap.prototype = {
     * Sets collision the given tile or tiles. You can pass in either a single numeric index or an array of indexes: [ 2, 3, 15, 20].
     * The `collides` parameter controls if collision will be enabled (true) or disabled (false).
     *
-    * @method Phaser.Tileset#setCollision
+    * @method Phaser.Tilemap#setCollision
     * @param {number|array} indexes - Either a single tile index, or an array of tile IDs to be checked for collision.
     * @param {boolean} [collides=true] - If true it will enable collision. If false it will clear collision.
     * @param {number|string|Phaser.TilemapLayer} [layer] - The layer to operate on. If not given will default to this.currentLayer.
@@ -43251,7 +43561,7 @@ Phaser.Tilemap.prototype = {
     * Calling this with a start value of 10 and a stop value of 14 would set collision for tiles 10, 11, 12, 13 and 14.
     * The `collides` parameter controls if collision will be enabled (true) or disabled (false).
     *
-    * @method Phaser.Tileset#setCollisionBetween
+    * @method Phaser.Tilemap#setCollisionBetween
     * @param {number} start - The first index of the tile to be set for collision.
     * @param {number} stop - The last index of the tile to be set for collision.
     * @param {boolean} [collides=true] - If true it will enable collision. If false it will clear collision.
@@ -43282,7 +43592,7 @@ Phaser.Tilemap.prototype = {
     * Sets collision on all tiles in the given layer, except for the IDs of those in the given array.
     * The `collides` parameter controls if collision will be enabled (true) or disabled (false).
     *
-    * @method Phaser.Tileset#setCollisionByExclusion
+    * @method Phaser.Tilemap#setCollisionByExclusion
     * @param {array} indexes - An array of the tile IDs to not be counted for collision.
     * @param {boolean} [collides=true] - If true it will enable collision. If false it will clear collision.
     * @param {number|string|Phaser.TilemapLayer} [layer] - The layer to operate on. If not given will default to this.currentLayer.
@@ -43311,7 +43621,7 @@ Phaser.Tilemap.prototype = {
     * Sets collision values on a tile in the set.
     * You shouldn't usually call this method directly, instead use setCollision, setCollisionBetween or setCollisionByExclusion.
     *
-    * @method Phaser.Tileset#setCollisionByIndex
+    * @method Phaser.Tilemap#setCollisionByIndex
     * @protected
     * @param {number} index - The index of the tile on the layer.
     * @param {boolean} [collides=true] - If true it will enable collision on the tile. If false it will clear collision values from the tile.
@@ -43354,7 +43664,7 @@ Phaser.Tilemap.prototype = {
     /**
     * Gets the TilemapLayer index as used in the setCollision calls.
     *
-    * @method Phaser.Tileset#getLayer
+    * @method Phaser.Tilemap#getLayer
     * @protected
     * @param {number|string|Phaser.TilemapLayer} layer - The layer to operate on. If not given will default to this.currentLayer.
     * @return {number} The TilemapLayer index.
@@ -43385,7 +43695,7 @@ Phaser.Tilemap.prototype = {
     /**
     * Internal function.
     *
-    * @method Phaser.Tileset#calculateFaces
+    * @method Phaser.Tilemap#calculateFaces
     * @protected
     * @param {number} layer - The index of the TilemapLayer to operate on.
     */
@@ -43442,7 +43752,7 @@ Phaser.Tilemap.prototype = {
     * Gets the tile above the tile coordinates given.
     * Mostly used as an internal function by calculateFaces.
     *
-    * @method Phaser.Tileset#getTileAbove
+    * @method Phaser.Tilemap#getTileAbove
     * @param {number} layer - The local layer index to get the tile from. Can be determined by Tilemap.getLayer().
     * @param {number} x - The x coordinate to get the tile from. In tiles, not pixels.
     * @param {number} y - The y coordinate to get the tile from. In tiles, not pixels.
@@ -43462,7 +43772,7 @@ Phaser.Tilemap.prototype = {
     * Gets the tile below the tile coordinates given.
     * Mostly used as an internal function by calculateFaces.
     *
-    * @method Phaser.Tileset#getTileBelow
+    * @method Phaser.Tilemap#getTileBelow
     * @param {number} layer - The local layer index to get the tile from. Can be determined by Tilemap.getLayer().
     * @param {number} x - The x coordinate to get the tile from. In tiles, not pixels.
     * @param {number} y - The y coordinate to get the tile from. In tiles, not pixels.
@@ -43482,7 +43792,7 @@ Phaser.Tilemap.prototype = {
     * Gets the tile to the left of the tile coordinates given.
     * Mostly used as an internal function by calculateFaces.
     *
-    * @method Phaser.Tileset#getTileLeft
+    * @method Phaser.Tilemap#getTileLeft
     * @param {number} layer - The local layer index to get the tile from. Can be determined by Tilemap.getLayer().
     * @param {number} x - The x coordinate to get the tile from. In tiles, not pixels.
     * @param {number} y - The y coordinate to get the tile from. In tiles, not pixels.
@@ -43502,7 +43812,7 @@ Phaser.Tilemap.prototype = {
     * Gets the tile to the right of the tile coordinates given.
     * Mostly used as an internal function by calculateFaces.
     *
-    * @method Phaser.Tileset#getTileRight
+    * @method Phaser.Tilemap#getTileRight
     * @param {number} layer - The local layer index to get the tile from. Can be determined by Tilemap.getLayer().
     * @param {number} x - The x coordinate to get the tile from. In tiles, not pixels.
     * @param {number} y - The y coordinate to get the tile from. In tiles, not pixels.
@@ -43559,7 +43869,7 @@ Phaser.Tilemap.prototype = {
                 this.layers[layer].data[y][x].index = tile;
             }
 
-			this.layers[layer].dirty = true;
+            this.layers[layer].dirty = true;
             this.calculateFaces(layer);
         }
 
@@ -43711,15 +44021,15 @@ Phaser.Tilemap.prototype = {
         }
 
         //  Find out the difference between tileblock[1].x/y and x/y and use it as an offset, as it's the top left of the block to paste
-        var diffX = tileblock[1].x - x;
-        var diffY = tileblock[1].y - y;
+        var diffX = x - tileblock[1].x;
+        var diffY = y - tileblock[1].y;
 
         for (var i = 1; i < tileblock.length; i++)
         {
             this.layers[layer].data[ diffY + tileblock[i].y ][ diffX + tileblock[i].x ].copy(tileblock[i]);
         }
 
-		this.layers[layer].dirty = true;
+        this.layers[layer].dirty = true;
         this.calculateFaces(layer);
 
     },

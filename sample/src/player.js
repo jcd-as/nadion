@@ -298,14 +298,35 @@
 
 	MyGame.Player.prototype.hit = function()
 	{
-		// a real game would do something more interesting here, but we'll just
-		// enter the 'stunned' state
-
 		// can't be hit while already stunned
 		if( this.fsm.getState() != 'stunned' )
 		{
 			this.fsm.consumeEvent( 'hit' );
 		}
+		// a real game would do something more interesting here, but we'll just
+		// enter the 'stunned' state and bounce back a bit
+
+		if( this.body.touching.right )
+		{
+			this.body.velocity.x = -150;
+			this.body.touching.right = false;
+		}
+		else if( this.body.touching.left )
+		{
+			this.body.velocity.x = 150;
+			this.body.touching.left = false;
+		}
+		if( this.body.touching.down )
+		{
+			this.body.velocity.y = -150;
+			this.body.touching.down = false;
+		}
+		else if( this.body.touching.up )
+		{
+			this.body.velocity.y = 150;
+			this.body.touching.up = false;
+		}
+
 	};
 
 	// start walking right
@@ -342,7 +363,6 @@
 	MyGame.Player.prototype.goRight = function()
 	{
 		this.scale.x = 1;
-		this.animations.stop();
 		this.facing = Phaser.RIGHT;
 		this.body.velocity.x = this.walk_velocity;
 	};
@@ -352,7 +372,6 @@
 	{
 		// flip on x axis
 		this.scale.x = -1;
-		this.animations.stop();
 		this.facing = Phaser.LEFT;
 		this.body.velocity.x = -this.walk_velocity;
 	};
